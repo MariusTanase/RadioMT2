@@ -297,7 +297,9 @@ invisible. Both are carried over as-is.
 
 ## Testing
 
-Pest feature tests, using `RefreshDatabase` against the existing SQLite file:
+Pest feature tests, using `RefreshDatabase`. `phpunit.xml` already pins tests to
+in-memory SQLite (`DB_CONNECTION=sqlite`, `DB_DATABASE=:memory:`), so the suite
+never touches the MySQL `radio` database used for local development:
 
 | Test | Asserts |
 |---|---|
