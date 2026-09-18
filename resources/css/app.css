@@ -3,924 +3,341 @@
 @source '../views';
 @source '../js';
 
+/* ===========================================================================
+   MT RADIO
+
+   A tuner for 58,000 stations. The job is to put something on and get out of
+   the way, so the design is typographic and near-monochrome: the station name
+   is the only loud thing on the page, everything else recedes.
+
+   Warm ink rather than blue-black — radio is a warm medium. One accent, brass,
+   used exclusively for the station currently playing and the control that
+   starts it. Nothing else is ever coloured.
+
+   No panels, no cards, no boxes. Separation is done with space and a single
+   hairline, which is what makes a long list readable rather than busy.
+   =========================================================================== */
+
 @theme {
     --font-sans: 'Sono', ui-sans-serif, system-ui, sans-serif;
     --font-opensans: 'Open Sans', ui-sans-serif, system-ui, sans-serif;
 
-    /* Defaults match the original :root block, which is the blue-ish base. */
-    --color-app: hsla(0, 0%, 0%, 1);
-    --color-app-text: hsla(0, 0%, 100%, 1);
-    --color-player: hsla(0, 0%, 100%, 1);
-    --color-button: hsla(0, 0%, 100%, 1);
-    --color-thumb: hsla(220, 50%, 10%, 1);
-    --color-icon-hover: hsla(220, 50%, 80%, 1);
-    --color-btn: hsla(220, 50%, 30%, 0.9);
-    --color-btn-border: hsla(220, 50%, 40%, 0.9);
-    --color-btn-hover: hsla(220, 30%, 50%, 0.9);
-    --color-menu: hsla(220, 50%, 10%, 0.8);
-    --color-menu-hover: hsla(220, 50%, 20%, 0.8);
-    --color-gear: hsla(220, 50%, 80%, 1);
+    --color-ink:      #0e0d0b;   /* the page */
+    --color-ink-lift: #161512;   /* hover, the dock */
+    --color-rule:     #221f1a;   /* the one hairline */
+    --color-paper:    #ece6dc;   /* type */
+    --color-mute:     #8b8377;   /* secondary type */
+    --color-faint:    #5a5449;   /* tertiary type, numerals */
+    --color-brass:    #d2a24c;   /* the accent. Playing, and play. */
+    --color-onair:    #e0574a;   /* live indicator only */
 }
 
-[data-theme='dark'] {
-    --color-app: hsla(0, 0%, 0%, 1);
-    --color-app-text: hsla(0, 0%, 100%, 1);
-    --color-player: hsla(0, 0%, 100%, 1);
-    --color-button: hsla(0, 0%, 100%, 1);
-    --color-thumb: hsla(220, 50%, 10%, 1);
-    --color-icon-hover: hsla(220, 100%, 40%, 1);
-    --color-btn: hsla(220, 50%, 10%, 0.9);
-    --color-btn-border: hsla(220, 50%, 80%, 0.9);
-    --color-btn-hover: hsla(220, 90%, 20%, 0.9);
-    --color-menu: hsla(220, 50%, 10%, 0.8);
-    --color-menu-hover: hsla(220, 100%, 40%, 0.8);
-    --color-gear: hsla(220, 50%, 80%, 1);
+/* The theme switcher writes [data-theme] on <body>. This design is one
+   considered palette rather than four, so every value resolves the same way —
+   the control still works, it simply has nothing left to swap. */
+:root,
+[data-theme] {
+    --color-app: var(--color-ink);
+    --color-app-text: var(--color-paper);
+    --color-menu: var(--color-ink-lift);
+    --color-menu-hover: var(--color-ink-lift);
+    --color-btn: var(--color-ink-lift);
+    --color-btn-border: var(--color-rule);
+    --color-btn-hover: var(--color-rule);
+    --color-player: var(--color-paper);
+    --color-button: var(--color-paper);
+    --color-icon-hover: var(--color-brass);
+    --color-thumb: var(--color-brass);
+    --color-gear: var(--color-faint);
 }
 
-[data-theme='crimson'] {
-    --color-app: hsla(0, 0%, 0%, 1);
-    --color-app-text: hsla(0, 0%, 100%, 1);
-    --color-player: hsla(0, 0%, 100%, 1);
-    --color-button: hsla(0, 0%, 100%, 1);
-    --color-thumb: hsla(0, 50%, 10%, 1);
-    --color-icon-hover: hsla(0, 50%, 80%, 1);
-    --color-btn: hsla(0, 50%, 30%, 0.9);
-    --color-btn-border: hsla(0, 50%, 50%, 0.9);
-    --color-btn-hover: hsla(0, 100%, 50%, 0.9);
-    --color-menu: hsla(0, 50%, 10%, 0.8);
-    --color-menu-hover: hsla(0, 50%, 20%, 0.8);
-    --color-gear: hsla(0, 50%, 40%, 1);
+html { background: var(--color-ink); }
+
+body {
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
 }
 
-[data-theme='light'] {
-    --color-app: hsla(0, 0%, 100%, 1);
-    --color-app-text: hsla(260, 100%, 30%, 1);
-    --color-player: hsla(0, 0%, 0%, 1);
-    --color-button: hsla(0, 0%, 0%, 1);
-    --color-thumb: hsla(0, 100%, 80%, 1);
-    --color-icon-hover: hsla(260, 100%, 40%, 1);
-    --color-btn: hsla(0, 10%, 100%, 0.9);
-    --color-btn-border: hsla(0, 100%, 10%, 0.9);
-    --color-btn-hover: hsla(0, 10%, 90%, 0.9);
-    --color-menu: hsla(0, 10%, 100%, 0.8);
-    --color-menu-hover: hsla(0, 50%, 80%, 0.8);
-    --color-gear: hsla(0, 50%, 80%, 1);
-}
-
-[data-theme='blue'] {
-    --color-app: hsla(0, 0%, 0%, 1);
-    --color-app-text: hsla(0, 100%, 99%, 1);
-    --color-player: hsla(0, 0%, 100%, 1);
-    --color-button: hsla(0, 0%, 100%, 1);
-    --color-thumb: hsla(220, 100%, 20%, 1);
-    --color-icon-hover: hsla(220, 100%, 50%, 1);
-    --color-btn: hsla(220, 50%, 20%, 0.9);
-    --color-btn-border: hsla(220, 100%, 40%, 0.9);
-    --color-btn-hover: hsla(220, 100%, 50%, 0.9);
-    --color-menu: hsla(220, 100%, 20%, 0.8);
-    --color-menu-hover: hsla(220, 100%, 40%, 0.8);
-    --color-gear: hsla(220, 50%, 90%, 1);
-}
-
-/*
- * === The Night Console — CSS foundation =====================================
- * Everything below is derived from docs/superpowers/specs/2026-09-18-posh-
- * redesign-direction.md §9 (type/colour/opacity), §5.2 (bevel + dock material)
- * and §10 (motion). It reads exclusively from the eleven semantic tokens
- * above via color-mix() — no new custom properties are introduced except the
- * two per-theme overrides §9.3 explicitly sanctions (the light-theme bevel
- * shadow edge and the light-theme ember fill), both marked below.
- *
- * These are hand-authored classes in @layer components / @layer utilities,
- * not Tailwind-generated utilities, so they compile into the build
- * unconditionally — Tailwind's @source content scan decides which of ITS
- * OWN generated utilities to keep, but it never tree-shakes selectors you
- * write directly in a layer. That means every class below is guaranteed to
- * exist in the built CSS the moment this file compiles, regardless of
- * whether the Blade partials that will reference them have been written yet.
- */
-
-@layer base {
-    :root {
-        --dock-h: 84px;
-    }
-
-    @media (max-width: 640px) {
-        :root {
-            --dock-h: 88px;
-        }
-    }
-
-    #catalogue {
-        padding-bottom: calc(var(--dock-h) + 24px);
-    }
+/* A single soft light from above. No photograph, no particles — they were
+   competing with the type for no benefit. */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(90% 50% at 50% -20%, rgb(210 162 76 / .07) 0%, transparent 70%);
 }
 
 @layer components {
-    /* --- Type scale (spec §9.1) ---------------------------------------- */
-    .nc-masthead      { font-family: var(--font-sans); font-size: 16px; line-height: 20px; font-weight: 600; opacity: 1; }
-    .nc-count-line    { font-family: var(--font-sans); font-size: 13px; line-height: 18px; font-weight: 500; opacity: .72; font-variant-numeric: tabular-nums; }
 
-    /* Rubric link: base state is inactive (48%); add `.is-active` or
-       `aria-current="true"` for the active state (100%, weight 600, 2px
-       underline in --color-btn-border) — shape, not colour alone. */
-    .nc-rubric        { font-family: var(--font-sans); font-size: 13px; line-height: 18px; font-weight: 500; opacity: .48; }
-    .nc-rubric.is-active,
-    .nc-rubric[aria-current='true'] {
-        font-weight: 600;
-        opacity: 1;
-        border-bottom: 2px solid var(--color-btn-border);
-    }
-
-    .nc-search-input  { font-family: var(--font-sans); font-size: 14px; line-height: 20px; font-weight: 400; opacity: 1; }
-    .nc-genre-label   { font-family: var(--font-sans); font-size: 13px; line-height: 16px; font-weight: 600; opacity: 1; }
-    .nc-genre-count   { font-family: var(--font-sans); font-size: 11px; line-height: 12px; font-weight: 400; opacity: .48; font-variant-numeric: tabular-nums; }
-
-    .nc-row-folio     {
-        font-family: var(--font-sans); font-size: 12px; line-height: 16px; font-weight: 500; opacity: .48;
-        font-variant-numeric: tabular-nums; text-align: right; min-width: 5ch;
-    }
-
-    /* Row title dims to 72% at rest and lifts to 100% when its row (an
-       ancestor carrying class `nc-row`) is hovered/focused/current. */
-    .nc-row-title     { font-family: var(--font-opensans); font-size: 15px; line-height: 20px; font-weight: 600; opacity: .72; transition: opacity 120ms ease-out; }
-    .nc-row:hover .nc-row-title,
-    .nc-row:focus-visible .nc-row-title,
-    .nc-row.is-active .nc-row-title,
-    .nc-row[aria-current='true'] .nc-row-title { opacity: 1; }
-
-    .nc-row-caption   { font-family: var(--font-sans); font-size: 12px; line-height: 16px; font-weight: 500; opacity: .48; font-variant-numeric: tabular-nums; }
-
-    .nc-dock-name     { font-family: var(--font-sans); font-size: 16px; line-height: 20px; font-weight: 500; opacity: 1; color: var(--color-player); }
-    @media (max-width: 640px) {
-        .nc-dock-name { font-size: 15px; line-height: 19px; }
-    }
-
-    .nc-dock-title    { font-family: var(--font-opensans); font-size: 13px; line-height: 18px; font-weight: 400; opacity: .72; }
-    .nc-dock-status   { font-family: var(--font-sans); font-size: 12px; line-height: 18px; font-weight: 500; opacity: 1; }
-    .nc-dock-monogram { font-family: var(--font-sans); font-size: 18px; line-height: 18px; font-weight: 500; opacity: .72; }
-    .nc-folio         { font-family: var(--font-sans); font-size: 13px; line-height: 18px; font-weight: 500; opacity: .72; font-variant-numeric: tabular-nums; }
-    .nc-colophon      { font-family: var(--font-sans); font-size: 11px; line-height: 14px; font-weight: 400; opacity: .48; }
-    .nc-empty-title   { font-family: var(--font-sans); font-size: 18px; line-height: 24px; font-weight: 500; opacity: 1; }
-    .nc-empty-body    { font-family: var(--font-opensans); font-size: 14px; line-height: 22px; font-weight: 400; opacity: .72; }
-
-    /* --- The bevel control law (spec §5.2 / §9.3) ---------------------- *
-     * The two-line color-mix bevel every clickable surface shares: a lit
-     * top edge and a shadow bottom edge, both derived from tokens already
-     * on the page. On :active the two edges swap and the surface drops 1px,
-     * reading as a physical depress. This is deliberately just the bevel —
-     * pair it with the caller's own background/border (--color-btn /
-     * --color-btn-border) and radius, so one class works on the transport
-     * housing, genre keys, the row play glyph and the search input alike.
-     *
-     * Theme-proof by construction: only light needs an override, because
-     * --color-app is white there and a 60%-of-white shadow edge disappears.
-     * See the light-theme override block below — the only per-theme rule
-     * this class needs. */
-    .nc-bevel {
-        box-shadow:
-            inset 0 1px 0 color-mix(in srgb, var(--color-app-text) 22%, transparent),
-            inset 0 -1px 0 color-mix(in srgb, var(--color-app) 60%, transparent);
-    }
-
-    .nc-bevel:active {
-        transform: translateY(1px);
-        box-shadow:
-            inset 0 -1px 0 color-mix(in srgb, var(--color-app-text) 22%, transparent),
-            inset 0 1px 0 color-mix(in srgb, var(--color-app) 60%, transparent);
-    }
-
-    .nc-bevel:focus-visible {
-        outline: 2px solid var(--color-icon-hover);
-        outline-offset: 1px;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        /* The bevel swap is a state and is kept; only the 1px travel drops. */
-        .nc-bevel:active { transform: none; }
-    }
-
-    /* --- The breathing ember (spec §7.1 / §10) -------------------------- *
-     * `.nc-ember` alone is the Playing state (breathing, 48%→100%→48% over
-     * 2.4s). Add `.nc-ember-static` alongside it for Connecting/Rebuffering
-     * (fixed at 48%, no animation). Fill is --color-btn-border, overridden
-     * to --color-icon-hover in the light theme below. */
-    .nc-ember {
-        display: inline-block;
-        border-radius: 9999px;
-        background: var(--color-btn-border);
-        animation: nc-ember-breathe 2.4s ease-in-out infinite;
-    }
-
-    .nc-ember.nc-ember-static {
-        animation: none;
-        opacity: .48;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        .nc-ember { animation: none; opacity: 1; }
-    }
-}
-
-@layer utilities {
-    /* --- The three-tier opacity discipline (spec §9.2) ------------------ *
-     * Exactly three values exist on the whole page. Reach for these instead
-     * of an arbitrary Tailwind opacity value so a fourth tier can't creep in. */
-    .nc-op-100 { opacity: 1; }
-    .nc-op-72  { opacity: .72; }
-    .nc-op-48  { opacity: .48; }
-}
-
-@keyframes nc-ember-breathe {
-    0%, 100% { opacity: .48; }
-    50%      { opacity: 1; }
-}
-
-/*
- * === The two sanctioned per-theme overrides (spec §9.3) =====================
- * No other per-theme rule may be added here without updating the spec.
- */
-
-/* 1. Light-theme bevel shadow edge: --color-app is white in light, so a
-      60%-of-white mix reads as nothing. Repoint it at --color-btn-border. */
-[data-theme='light'] .nc-bevel {
-    box-shadow:
-        inset 0 1px 0 color-mix(in srgb, var(--color-app-text) 22%, transparent),
-        inset 0 -1px 0 color-mix(in srgb, var(--color-btn-border) 35%, transparent);
-}
-
-[data-theme='light'] .nc-bevel:active {
-    box-shadow:
-        inset 0 -1px 0 color-mix(in srgb, var(--color-app-text) 22%, transparent),
-        inset 0 1px 0 color-mix(in srgb, var(--color-btn-border) 35%, transparent);
-}
-
-/* 2. Light-theme ember fill: swap to --color-icon-hover (violet, 40%
-      lightness) so the dot still reads as lit on a white/near-white menu. */
-[data-theme='light'] .nc-ember {
-    background: var(--color-icon-hover);
-}
-
-/*
- * Two rules resist utilities: the webkit range thumb pseudo-element, and the
- * gear's rotation keyframes.
- */
-@layer components {
-    .volume-slider {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 100%;
-        height: 3px;
-        background: var(--color-app-text);
-        opacity: 0.9;
-    }
-
-    .volume-slider:hover {
-        opacity: 1;
-    }
-
-    .volume-slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 15px;
-        height: 15px;
-        border-radius: 50%;
-        background: var(--color-thumb);
-        border: 1px solid var(--color-app-text);
-        cursor: pointer;
-    }
-
-    .volume-slider::-moz-range-thumb {
-        width: 15px;
-        height: 15px;
-        border-radius: 50%;
-        background: var(--color-thumb);
-        border: 1px solid var(--color-app-text);
-        cursor: pointer;
-    }
-
-    .animate-gear {
-        animation: gear-spin 10s linear infinite;
-    }
-}
-
-@keyframes gear-spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-/* ---------------------------------------------------------------------------
-   Ground and surface.
-
-   The page renders over a full-bleed photograph with a particle field on top.
-   Before this, `main` and `#catalogue` were fully transparent, so station rows
-   sat directly on the photo and were close to unreadable. A photograph cannot
-   be a background unless something sits between it and the type.
-
-   Two moves: scrim the photo so it becomes atmosphere rather than subject, and
-   give the content an actual pane of glass to sit on.
-   --------------------------------------------------------------------------- */
-@layer components {
-    .background::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        background:
-            radial-gradient(
-                130% 90% at 50% -10%,
-                transparent 0%,
-                color-mix(in srgb, var(--color-app) 45%, transparent) 45%,
-                color-mix(in srgb, var(--color-app) 82%, transparent) 100%
-            ),
-            linear-gradient(
-                to bottom,
-                color-mix(in srgb, var(--color-app) 62%, transparent) 0%,
-                color-mix(in srgb, var(--color-app) 30%, transparent) 30%,
-                color-mix(in srgb, var(--color-app) 72%, transparent) 78%,
-                color-mix(in srgb, var(--color-app) 94%, transparent) 100%
-            );
-    }
-
-    /* Keep the star field above the scrim — it is the one thing meant to read
-       through, and the design calls it the "vibey" element. */
-    #tsparticles {
+    /* --- shell ---------------------------------------------------------- */
+    .shell {
         position: relative;
         z-index: 1;
+        width: 100%;
+        max-width: 880px;
+        margin-inline: auto;
+        padding-inline: 28px;
     }
+    @media (max-width: 720px) { .shell { padding-inline: 18px; } }
 
-    /* The pane. One surface for the whole browsing column so the tune bar,
-       genre band and ledger read as a single object rather than three floating
-       strips. */
-    .nc-pane {
-        background: color-mix(in srgb, var(--color-app) 72%, transparent);
-        backdrop-filter: blur(18px) saturate(115%);
-        -webkit-backdrop-filter: blur(18px) saturate(115%);
-        border: 1px solid color-mix(in srgb, var(--color-app-text) 9%, transparent);
-        border-radius: 16px;
-        box-shadow:
-            0 1px 0 color-mix(in srgb, var(--color-app-text) 7%, transparent) inset,
-            0 24px 60px -20px color-mix(in srgb, var(--color-app) 90%, transparent);
+    /* --- masthead ------------------------------------------------------- */
+    .masthead {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+        padding-block: 40px 26px;
+        padding-right: 52px;
     }
-
-    /* Rows need to breathe: 84px of dock plus clearance was already reserved,
-       but the list itself was cramped against the pane edges. */
-    #catalogue {
-        padding-inline: clamp(12px, 2vw, 22px);
-        padding-block: 18px;
+    .wordmark {
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: .16em;
+        color: var(--color-paper);
     }
-}
-
-/* ---------------------------------------------------------------------------
-   Dock presence.
-
-   The plate was structurally correct but tonally flat: same navy as everything
-   above it, so it read as a band rather than an object. These give it an edge,
-   a focal control, and the one piece of motion the page has been missing.
-   --------------------------------------------------------------------------- */
-@layer components {
-    /* A brighter hairline and a deeper drop so the plate sits in FRONT of the
-       page rather than alongside it. */
-    #dock {
-        border-top: 1px solid color-mix(in srgb, var(--color-app-text) 16%, transparent);
-        box-shadow:
-            0 -1px 0 color-mix(in srgb, var(--color-app-text) 6%, transparent) inset,
-            0 -18px 48px -12px color-mix(in srgb, var(--color-app) 92%, transparent);
+    .masthead-count {
+        font-size: 12px;
+        font-weight: 400;
+        color: var(--color-faint);
+        font-variant-numeric: tabular-nums;
     }
+    @media (max-width: 720px) { .masthead { padding-block: 22px 16px; } }
 
-    /* The transport's primary action earns a filled, circular treatment — it is
-       the one control people reach for without looking. */
-    .nc-play {
-        border-radius: 9999px;
-        background: color-mix(in srgb, var(--color-icon-hover) 92%, var(--color-app));
-        color: color-mix(in srgb, var(--color-app) 86%, var(--color-app-text));
-        box-shadow:
-            0 1px 0 color-mix(in srgb, var(--color-app-text) 34%, transparent) inset,
-            0 6px 18px -6px color-mix(in srgb, var(--color-icon-hover) 70%, transparent);
-        transition: transform .14s ease, box-shadow .14s ease, background-color .14s ease;
-    }
-    .nc-play:hover { background: var(--color-icon-hover); transform: translateY(-1px); }
-    .nc-play:active { transform: translateY(1px); box-shadow: 0 1px 0 color-mix(in srgb, var(--color-app) 40%, transparent) inset; }
-    @media (prefers-reduced-motion: reduce) {
-        .nc-play, .nc-play:hover, .nc-play:active { transform: none; transition: none; }
-    }
-
-    /* Audio effect: a five-bar level meter beside the now-playing readout.
-       Deliberately NOT driven by a Web Audio analyser — reading real levels
-       needs crossOrigin on the media element, which silences every stream whose
-       server sends no CORS headers, i.e. most of this catalogue. So it is
-       animation keyed to isPlaying: the feel of a meter without trading away
-       playback. */
-    .nc-meter { display: inline-flex; align-items: flex-end; gap: 2px; height: 14px; }
-    .nc-meter span {
-        width: 2px;
-        height: 100%;
-        border-radius: 1px;
-        background: var(--color-icon-hover);
-        transform-origin: bottom;
-        transform: scaleY(.22);
-        opacity: .5;
-    }
-    .nc-meter.is-live span { animation: nc-meter-bounce 1.1s ease-in-out infinite; opacity: .95; }
-    .nc-meter.is-live span:nth-child(1) { animation-duration: .92s; animation-delay: -.30s; }
-    .nc-meter.is-live span:nth-child(2) { animation-duration: 1.26s; animation-delay: -.10s; }
-    .nc-meter.is-live span:nth-child(3) { animation-duration: .78s;  animation-delay: -.52s; }
-    .nc-meter.is-live span:nth-child(4) { animation-duration: 1.14s; animation-delay: -.22s; }
-    .nc-meter.is-live span:nth-child(5) { animation-duration: .96s;  animation-delay: -.66s; }
-
-    @keyframes nc-meter-bounce {
-        0%, 100% { transform: scaleY(.24); }
-        50%      { transform: scaleY(1); }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        .nc-meter.is-live span { animation: none; transform: scaleY(.55); }
-    }
-}
-
-/* ---------------------------------------------------------------------------
-   Controls.
-
-   The tune bar was eight bright bordered boxes in a row, each the same visual
-   weight, plus two raw browser checkboxes and three unstyled native selects.
-   Borders everywhere means the eye has nowhere to rest, and native form chrome
-   is what makes an interface read as a form rather than a product.
-
-   The rule here: controls sit ON the pane, they are not boxes on it. One height
-   (36px), no resting borders, weight earned only by state.
-   --------------------------------------------------------------------------- */
-@layer components {
-    .nc-field {
-        height: 36px;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding-inline: 12px;
+    /* --- search: a rule, not a box -------------------------------------- */
+    .search {
+        width: 100%;
+        height: 46px;
         border: 0;
-        border-radius: 8px;
-        background: color-mix(in srgb, var(--color-app-text) 6%, transparent);
-        color: var(--color-app-text);
+        border-bottom: 1px solid var(--color-rule);
+        background: transparent;
+        color: var(--color-paper);
+        font-family: var(--font-sans);
+        font-size: 17px;
+        font-weight: 400;
+        padding: 0 0 6px;
+        transition: border-color .18s ease;
+    }
+    .search::placeholder { color: var(--color-faint); }
+    .search:focus { outline: none; border-bottom-color: var(--color-brass); }
+    @media (max-width: 720px) { .search { font-size: 16px; height: 42px; } }
+
+    /* --- filters: plain selects that look like text --------------------- */
+    .filters { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; padding-block: 16px; }
+    .sel {
+        appearance: none;
+        border: 0;
+        background: transparent;
+        color: var(--color-mute);
         font-family: var(--font-sans);
         font-size: 13px;
         font-weight: 500;
-        line-height: 1;
-        transition: background-color .16s ease, box-shadow .16s ease;
-    }
-    .nc-field:hover { background: color-mix(in srgb, var(--color-app-text) 11%, transparent); }
-    .nc-field:focus-visible,
-    .nc-field:focus-within {
-        outline: none;
-        box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-icon-hover) 70%, transparent);
-    }
-
-    /* Native selects: strip the platform chrome, supply one quiet chevron. */
-    select.nc-field {
-        appearance: none;
-        -webkit-appearance: none;
-        padding-right: 30px;
-        background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
-                          linear-gradient(135deg, currentColor 50%, transparent 50%);
-        background-position: calc(100% - 15px) 50%, calc(100% - 10px) 50%;
-        background-size: 5px 5px, 5px 5px;
+        padding: 4px 16px 4px 0;
+        cursor: pointer;
+        background-image:
+            linear-gradient(45deg, transparent 50%, var(--color-faint) 50%),
+            linear-gradient(135deg, var(--color-faint) 50%, transparent 50%);
+        background-position: right 4px center, right 0 center;
+        background-size: 4px 4px, 4px 4px;
         background-repeat: no-repeat;
     }
-    select.nc-field option { background: var(--color-app); color: var(--color-app-text); }
+    .sel:hover, .sel:focus { color: var(--color-paper); outline: none; }
+    .sel option { background: var(--color-ink-lift); color: var(--color-paper); }
 
-    input.nc-field::placeholder { color: color-mix(in srgb, var(--color-app-text) 45%, transparent); font-weight: 400; }
-    input.nc-field::-webkit-search-cancel-button { filter: invert(1); opacity: .5; }
+    .switch {
+        display: inline-flex; align-items: center; gap: 8px;
+        font-size: 13px; font-weight: 500; color: var(--color-mute);
+        cursor: pointer; user-select: none;
+    }
+    .switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+    .switch::before {
+        content: ''; flex: none; width: 24px; height: 14px; border-radius: 999px;
+        background: var(--color-rule);
+        display: inline-block; position: relative;
+        transition: background-color .18s ease;
+    }
+    .switch::after {
+        content: ''; position: absolute; left: 3px;
+        width: 10px; height: 10px; border-radius: 999px;
+        background: var(--color-faint);
+        transition: transform .18s ease, background-color .18s ease;
+    }
+    .switch { position: relative; }
+    .switch:has(input:checked) { color: var(--color-paper); }
+    .switch:has(input:checked)::before { background: color-mix(in srgb, var(--color-brass) 40%, transparent); }
+    .switch:has(input:checked)::after { background: var(--color-brass); transform: translateX(10px); }
+    .switch:has(input:focus-visible)::before { box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-brass) 60%, transparent); }
 
-    /* Toggles: the native checkbox is hidden and the label itself becomes the
-       control, so "on" is a filled pill rather than a tick in a white square. */
-    .nc-toggle { cursor: pointer; user-select: none; }
-    .nc-toggle input { position: absolute; opacity: 0; width: 1px; height: 1px; }
-    .nc-toggle::before {
-        content: '';
-        width: 6px; height: 6px;
-        border-radius: 9999px;
-        background: color-mix(in srgb, var(--color-app-text) 28%, transparent);
-        transition: background-color .16s ease, box-shadow .16s ease;
+    /* --- genres: an index line, not chips ------------------------------- */
+    .genres {
+        display: flex; gap: 22px; align-items: center;
+        overflow-x: auto; scrollbar-width: none;
+        padding-block: 14px;
+        border-block: 1px solid var(--color-rule);
+        -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 36px), transparent 100%);
+        mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 36px), transparent 100%);
     }
-    .nc-toggle:has(input:checked) {
-        background: color-mix(in srgb, var(--color-icon-hover) 22%, transparent);
-        color: var(--color-app-text);
-    }
-    .nc-toggle:has(input:checked)::before {
-        background: var(--color-icon-hover);
-        box-shadow: 0 0 10px color-mix(in srgb, var(--color-icon-hover) 80%, transparent);
-    }
-    .nc-toggle:has(input:focus-visible) {
-        box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-icon-hover) 70%, transparent);
-    }
-
-    /* Genre pills: text first, count as a quiet trailing numeral on the SAME
-       line. The previous two-line bordered boxes made ten of them read as ten
-       competing objects. */
-    .nc-pill {
-        height: 32px;
-        display: inline-flex;
-        align-items: baseline;
-        gap: 6px;
-        padding-inline: 12px;
-        border: 0;
-        border-radius: 9999px;
-        background: transparent;
-        color: var(--color-app-text);
-        font-family: var(--font-sans);
-        font-size: 13px;
-        font-weight: 500;
+    .genres::-webkit-scrollbar { display: none; }
+    .genre {
+        flex: none;
+        font-size: 13px; font-weight: 500;
+        color: var(--color-mute);
+        text-decoration: none;
         white-space: nowrap;
-        opacity: .72;
-        transition: background-color .16s ease, opacity .16s ease;
+        transition: color .16s ease;
     }
-    .nc-pill:hover { background: color-mix(in srgb, var(--color-app-text) 8%, transparent); opacity: 1; }
-    .nc-pill[aria-current='true'] {
-        background: color-mix(in srgb, var(--color-icon-hover) 20%, transparent);
-        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-icon-hover) 45%, transparent);
-        opacity: 1;
-    }
-    .nc-pill .nc-pill-count {
-        font-size: 11px;
+    .genre:hover { color: var(--color-paper); }
+    .genre[aria-current='true'] { color: var(--color-brass); }
+    .genre-n { font-size: 11px; color: var(--color-faint); margin-left: 5px; font-variant-numeric: tabular-nums; }
+
+    /* --- the list ------------------------------------------------------- */
+    .meta-line {
+        padding-block: 22px 12px;
+        font-size: 12px;
+        color: var(--color-faint);
         font-variant-numeric: tabular-nums;
-        opacity: .55;
-    }
-    .nc-pill:focus-visible {
-        outline: none;
-        box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-icon-hover) 70%, transparent);
     }
 
-    /* The genre strip scrolls; fade its trailing edge instead of clipping a
-       label mid-word against the pane border. */
-    .nc-strip {
-        overflow-x: auto;
-        scrollbar-width: none;
-        -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 40px), transparent 100%);
-        mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 40px), transparent 100%);
-    }
-    .nc-strip::-webkit-scrollbar { display: none; }
-}
-
-/* ===========================================================================
-   2026 VISUAL LAYER — a ground-up replacement.
-
-   Everything above this point descends from a 2020 hobby project: a navy
-   palette built from HSLA scale variables, a full-bleed holiday photograph,
-   and a particle field. This block overrides that lineage wholesale while
-   keeping the same eleven token NAMES, so every partial inherits the new
-   look without being rewritten.
-
-   The palette: near-black ground, a single warm accent, and light used
-   sparingly as elevation rather than colour.
-   =========================================================================== */
-:root,
-[data-theme='blue'],
-[data-theme='dark'],
-[data-theme='crimson'],
-[data-theme='light'] {
-    --color-app:          #07070a;
-    --color-app-text:     #f4f4f6;
-    --color-player:       #ffffff;
-    --color-button:       #f4f4f6;
-
-    /* Surfaces are elevations of the ground, not separate hues. */
-    --color-menu:         #101016;
-    --color-menu-hover:   #17171f;
-    --color-btn:          #14141b;
-    --color-btn-border:   #26262f;
-    --color-btn-hover:    #1d1d26;
-
-    /* One accent. Everything interactive borrows it; nothing else does. */
-    --color-icon-hover:   #ff6a3d;
-    --color-thumb:        #ff6a3d;
-    --color-gear:         #8a8a99;
-}
-
-/* The photograph and the particle field are gone — they were the single
-   biggest source of noise and the reason type needed a scrim to survive. */
-.background {
-    background-image: none !important;
-    background-color: var(--color-app);
-}
-.background::after {
-    background:
-        radial-gradient(90% 55% at 50% -8%, color-mix(in srgb, var(--color-icon-hover) 13%, transparent) 0%, transparent 62%),
-        radial-gradient(70% 45% at 88% 8%, color-mix(in srgb, #4b6cff 9%, transparent) 0%, transparent 60%);
-}
-#tsparticles { display: none; }
-
-@layer components {
-    /* The pane becomes a quiet elevation, not a glass slab over a photo. */
-    .nc-pane {
-        background: color-mix(in srgb, var(--color-menu) 82%, transparent);
-        backdrop-filter: blur(24px) saturate(120%);
-        -webkit-backdrop-filter: blur(24px) saturate(120%);
-        border: 1px solid #1c1c24;
-        border-radius: 20px;
-        box-shadow:
-            0 1px 0 rgb(255 255 255 / .04) inset,
-            0 40px 90px -40px #000;
-    }
-
-    /* Type: real hierarchy. The station name is the object; everything else
-       is annotation, set small, wide-tracked and dim. */
-    .nc-row-title {
-        font-family: var(--font-sans);
-        font-size: 15px;
-        line-height: 20px;
-        font-weight: 550;
-        letter-spacing: -0.01em;
-        opacity: .92;
-    }
-    .nc-row:hover .nc-row-title { opacity: 1; }
-    .nc-row-caption {
-        font-family: var(--font-sans);
-        font-size: 10.5px;
-        line-height: 14px;
-        font-weight: 500;
-        letter-spacing: .10em;
-        text-transform: uppercase;
-        opacity: .40;
-    }
-    .nc-row-folio {
-        font-family: var(--font-sans);
-        font-size: 11px;
-        font-weight: 600;
-        font-variant-numeric: tabular-nums;
-        letter-spacing: .04em;
-        opacity: .26;
-    }
-    .nc-row {
-        border-bottom: 1px solid #16161d !important;
+    .station {
+        display: grid;
+        grid-template-columns: 34px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 16px;
+        width: 100%;
+        padding: 15px 10px 15px 0;
+        border: 0;
+        border-bottom: 1px solid var(--color-rule);
+        background: transparent;
+        text-align: left;
+        cursor: pointer;
         transition: background-color .14s ease;
     }
-    .nc-row:hover { background: #121219; }
-    .nc-row[aria-current='true'] { background: color-mix(in srgb, var(--color-icon-hover) 9%, transparent); }
-
-    .nc-count-line {
-        font-family: var(--font-sans);
-        font-size: 10.5px;
-        font-weight: 500;
-        letter-spacing: .12em;
-        text-transform: uppercase;
-        opacity: .38;
+    .station:hover { background: var(--color-ink-lift); }
+    .station:focus-visible { outline: 2px solid var(--color-brass); outline-offset: -2px; }
+    .station-n {
+        font-size: 12px; color: var(--color-faint);
+        font-variant-numeric: tabular-nums; text-align: right;
     }
-
-    /* The dock: a true black plate, one accent control, nothing else loud. */
-    #dock {
-        background: #0a0a0e !important;
-        background-image: none !important;
-        border-top: 1px solid #1c1c24 !important;
-        box-shadow: 0 -30px 60px -30px #000 !important;
+    /* Name over meta. Both were inline, so a long name pushed its metadata
+       onto a second line and the live dot wrapped out of its column. */
+    .station-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+    .station-name {
+        display: block;
+        font-size: 17px; font-weight: 500; line-height: 22px;
+        color: var(--color-paper);
+        letter-spacing: -.01em;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
-    .nc-dock-name  { font-size: 14px; font-weight: 550; letter-spacing: -0.01em; }
-    .nc-dock-title { font-size: 12px; opacity: .55; }
-    .nc-dock-status{ font-size: 10.5px; letter-spacing: .10em; text-transform: uppercase; opacity: .45; }
-
-    .nc-play {
-        background: var(--color-icon-hover);
-        color: #0a0a0e;
-        box-shadow: 0 8px 24px -8px color-mix(in srgb, var(--color-icon-hover) 85%, transparent);
+    .station-meta {
+        display: block;
+        font-size: 12px; font-weight: 400; line-height: 17px;
+        color: var(--color-faint);
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
-    .nc-play:hover { background: #ff7d55; }
+    .station-meta span + span::before { content: '   '; white-space: pre; }
+    .station[aria-current='true'] .station-name { color: var(--color-brass); }
+    .station[aria-current='true'] .station-n { color: var(--color-brass); }
 
-    .nc-meter span { background: var(--color-icon-hover); }
-
-    /* Volume reads as a track, not a hairline. */
-    .volume-slider {
-        height: 3px !important;
-        border-radius: 999px;
-        background: #26262f !important;
-        opacity: 1 !important;
-    }
-    .volume-slider::-webkit-slider-thumb {
-        width: 11px; height: 11px;
-        background: var(--color-app-text);
-        border: none;
-    }
-    .volume-slider::-moz-range-thumb {
-        width: 11px; height: 11px;
-        background: var(--color-app-text);
-        border: none;
-    }
-}
-
-/* ---------------------------------------------------------------------------
-   Phones.
-
-   Three things make a desktop-first layout feel clunky on a phone: surfaces
-   that keep their desktop margins and corners so content is squeezed into a
-   narrow gutter, tap targets sized for a cursor, and a fixed bar that sits
-   under the iOS home indicator. All three are addressed here.
-   --------------------------------------------------------------------------- */
-@media (max-width: 720px) {
-    :root { --dock-h: 76px; }
-
-    /* Full-bleed: on a 390px screen, 16px of side margin plus a 20px radius
-       costs a tenth of the width and buys nothing. */
-    .nc-pane {
-        margin-top: 0;
-        border-inline: 0;
-        border-top: 0;
-        border-radius: 0;
-        box-shadow: none;
-        backdrop-filter: none;
-        -webkit-backdrop-filter: none;   /* blur is expensive on mobile GPUs */
-        background: color-mix(in srgb, var(--color-menu) 94%, transparent);
-    }
-
-    /* Touch targets. 48px is the floor; the whole row is the target, never a
-       small glyph inside it. */
-    .nc-row { min-height: 56px; }
-    .nc-field { height: 40px; font-size: 14px; }     /* 16px input avoids iOS zoom — see below */
-    .nc-pill { height: 36px; padding-inline: 14px; font-size: 13px; }
-
-    /* iOS zooms the page when a focused input is under 16px. */
-    input.nc-field,
-    select.nc-field { font-size: 16px; }
-
-    /* Type: bump the object, keep the annotation quiet. */
-    .nc-row-title   { font-size: 15.5px; line-height: 21px; }
-    .nc-row-caption { font-size: 10px; letter-spacing: .08em; }
-    .nc-count-line  { font-size: 10px; }
-
-    /* The dock clears the home indicator instead of sitting under it. */
-    #dock {
-        padding-bottom: env(safe-area-inset-bottom, 0px);
-        height: calc(var(--dock-h) + env(safe-area-inset-bottom, 0px));
-    }
-
-    /* Momentum scrolling on the genre strip, and enough end padding that the
-       last pill is reachable rather than pinned under the fade. */
-    .nc-strip {
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior-x: contain;
-        scroll-snap-type: x proximity;
-        padding-inline-end: 44px;
-    }
-    .nc-strip .nc-pill { scroll-snap-align: center; }
-
-    /* Hover states never fire on touch; make sure nothing depends on them. */
-    .nc-row:hover { background: transparent; }
-    .nc-row:active { background: #15151d; }
-}
-
-/* Nothing may cause a sideways scroll on a phone. */
-html, body { max-width: 100%; overflow-x: hidden; }
-
-/* ===========================================================================
-   THE ILLUMINATED DIAL
-
-   Replaces the near-black-plus-one-neon-accent pass, which was three of the
-   commonest generated-design tells at once: tinted near-black ground, a single
-   hot accent, tracked ALL-CAPS labels, and meta strings joined with middle dots.
-
-   The idea instead comes from the subject: a tuner's faceplate. Warm lamp light
-   behind glass, a dark bakelite surround, an engraved scale. Radio is a warm
-   medium, and every streaming interface is cold blue-black.
-
-   Two accents, each with one job:
-     lamp  — amber. Where the dial is pointing: the tuned station, the transport.
-     tally — studio red. ON AIR only. Never decoration.
-   =========================================================================== */
-:root,
-[data-theme='blue'], [data-theme='dark'], [data-theme='crimson'], [data-theme='light'] {
-    --color-app:        #17130f;   /* case: deep warm brown-black */
-    --color-menu:       #201b15;   /* glass: the lit panel */
-    --color-menu-hover: #2a231b;   /* glass, raised */
-    --color-btn:        #241e17;
-    --color-btn-hover:  #2f2820;
-    --color-btn-border: #3a3127;
-
-    --color-app-text:   #f2e8d5;   /* lamp through glass — warm ivory, not white */
-    --color-player:     #fdf7ea;
-    --color-button:     #f2e8d5;
-
-    --color-icon-hover: #f0b429;   /* the lamp */
-    --color-thumb:      #f0b429;
-    --color-gear:       #9a8d79;
-}
-
-.background::after {
-    background:
-        radial-gradient(75% 45% at 50% -12%, color-mix(in srgb, var(--color-icon-hover) 14%, transparent) 0%, transparent 64%),
-        radial-gradient(60% 40% at 12% 4%, color-mix(in srgb, #c96a2b 8%, transparent) 0%, transparent 58%);
-}
-
-@layer components {
-    .nc-pane {
-        background: color-mix(in srgb, var(--color-menu) 88%, transparent);
-        border: 1px solid #2c251d;
-        box-shadow:
-            0 1px 0 rgb(255 240 214 / .05) inset,
-            0 40px 90px -40px #000;
-    }
-
-    /* Captions: sentence case with normal tracking. Tracked-out uppercase
-       eyebrows are a generated-design tell and they slow reading. */
-    .nc-row-caption {
-        font-size: 11.5px;
-        line-height: 15px;
-        font-weight: 450;
-        letter-spacing: 0;
-        text-transform: none;
-        opacity: .42;
-        font-variant-numeric: tabular-nums;
-    }
-    .nc-count-line {
-        font-size: 12px;
-        letter-spacing: 0;
-        text-transform: none;
-        opacity: .40;
-    }
-    .nc-row-folio {
-        opacity: .22;
-        font-variant-numeric: tabular-nums;
-    }
-    .nc-row { border-bottom: 1px solid #241e17 !important; }
-    .nc-row:hover { background: #241e17; }
-
-    /* The tuned station: the lamp is behind it, not on it. */
-    .nc-row[aria-current='true'] {
-        background: linear-gradient(90deg,
-            color-mix(in srgb, var(--color-icon-hover) 13%, transparent) 0%,
-            transparent 62%);
-        box-shadow: inset 2px 0 0 var(--color-icon-hover);
-    }
-
-    #dock {
-        background: #13100c !important;
-        border-top: 1px solid #2c251d !important;
-        box-shadow: 0 -30px 70px -30px #000 !important;
-    }
-    .nc-dock-status { letter-spacing: 0; text-transform: none; opacity: .5; font-size: 11.5px; }
-
-    .nc-play {
-        background: var(--color-icon-hover);
-        color: #17130f;
-        box-shadow: 0 10px 26px -10px color-mix(in srgb, var(--color-icon-hover) 80%, transparent);
-    }
-    .nc-play:hover { background: #ffc24d; }
-
-    /* ON AIR: the only red on the page, and only when something is playing. */
-    .nc-meter.is-live span { background: #e2483d; }
-    .nc-meter span { background: color-mix(in srgb, var(--color-app-text) 30%, transparent); }
-
-    .nc-pill[aria-current='true'] {
-        background: color-mix(in srgb, var(--color-icon-hover) 16%, transparent);
-        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-icon-hover) 40%, transparent);
-    }
-    .nc-toggle:has(input:checked) { background: color-mix(in srgb, var(--color-icon-hover) 18%, transparent); }
-    .nc-toggle:has(input:checked)::before { background: var(--color-icon-hover); }
-
-    .volume-slider { background: #3a3127 !important; }
-    .volume-slider::-webkit-slider-thumb { background: var(--color-app-text); }
-    .volume-slider::-moz-range-thumb { background: var(--color-app-text); }
-}
-
-@layer components {
-    /* The control header stays at the top of the pane while the list scrolls
-       under it. It needs its own ground, or rows show through. */
-    .nc-controls {
-        background: color-mix(in srgb, var(--color-menu) 97%, transparent);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border-bottom: 1px solid #2c251d;
-        border-radius: 20px 20px 0 0;
-    }
     @media (max-width: 720px) {
-        .nc-controls { border-radius: 0; }
+        .station { grid-template-columns: 26px minmax(0, 1fr) auto; gap: 12px; padding-block: 14px; }
+        .station-name { font-size: 16px; }
+    }
 
-        /* Leave room for the settings control so it never sits on the genre
-           strip — on a 500px screen the gear was eating 155px of it. */
-        .nc-controls { padding-right: 46px; }
+    /* --- paging --------------------------------------------------------- */
+    .pager { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 26px 40px; }
+    .pager-link {
+        font-size: 13px; font-weight: 500; color: var(--color-mute);
+        text-decoration: none; transition: color .16s ease;
+    }
+    .pager-link:hover { color: var(--color-paper); }
+    .pager-link[aria-disabled='true'] { color: var(--color-faint); pointer-events: none; }
+    .pager-pos { font-size: 12px; color: var(--color-faint); font-variant-numeric: tabular-nums; }
+
+    /* --- empty ---------------------------------------------------------- */
+    .empty { padding-block: 80px; text-align: center; }
+    .empty-h { font-size: 17px; font-weight: 500; color: var(--color-paper); }
+    .empty-p { font-size: 13px; color: var(--color-mute); margin-top: 8px; }
+
+    /* --- the dock ------------------------------------------------------- */
+    .dock {
+        position: fixed; inset-inline: 0; bottom: 0; z-index: 40;
+        height: var(--dock-h);
+        background: var(--color-ink-lift);
+        border-top: 1px solid var(--color-rule);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    .dock-in {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        align-items: center;
+        gap: 20px;
+        height: var(--dock-h);
+        max-width: 880px;
+        margin-inline: auto;
+        padding-inline: 28px;
+    }
+    .dock-art {
+        width: 40px; height: 40px; flex: none;
+        border-radius: 3px;
+        background: var(--color-rule);
+        display: grid; place-items: center;
+        font-size: 15px; font-weight: 500; color: var(--color-faint);
+        overflow: hidden; position: relative;
+    }
+    .dock-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .dock-name  { font-size: 14px; font-weight: 500; color: var(--color-paper); }
+    .dock-track { font-size: 12px; color: var(--color-mute); }
+    .dock-idle  { font-size: 13px; color: var(--color-faint); }
+    .truncate1  { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .tbtn {
+        width: 34px; height: 34px; border: 0; background: transparent;
+        color: var(--color-mute); display: grid; place-items: center;
+        border-radius: 999px; cursor: pointer; font-size: 15px;
+        transition: color .16s ease;
+    }
+    .tbtn:hover { color: var(--color-paper); }
+    .tbtn:focus-visible { outline: 2px solid var(--color-brass); outline-offset: 2px; }
+
+    .pbtn {
+        width: 42px; height: 42px; border: 0; border-radius: 999px;
+        background: var(--color-brass); color: var(--color-ink);
+        display: grid; place-items: center; cursor: pointer; font-size: 16px;
+        transition: transform .14s ease, background-color .14s ease;
+    }
+    .pbtn:hover { background: #e2b75f; }
+    .pbtn:active { transform: scale(.94); }
+    .pbtn:disabled { opacity: .35; pointer-events: none; }
+    .pbtn:focus-visible { outline: 2px solid var(--color-brass); outline-offset: 3px; }
+
+    /* On air: the only red, and only while sound is actually coming out. */
+    .onair { width: 6px; height: 6px; border-radius: 999px; background: var(--color-faint); flex: none; }
+    .onair.is-live { background: var(--color-onair); animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
+
+    .vol { width: 90px; height: 3px; appearance: none; background: var(--color-rule); border-radius: 999px; cursor: pointer; }
+    .vol::-webkit-slider-thumb { appearance: none; width: 11px; height: 11px; border-radius: 999px; background: var(--color-paper); }
+    .vol::-moz-range-thumb { width: 11px; height: 11px; border: 0; border-radius: 999px; background: var(--color-paper); }
+
+    @media (max-width: 720px) {
+        .dock-in { grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; padding-inline: 18px; }
+        .dock-art { width: 38px; height: 38px; }
     }
 }
 
-/* The settings control is a quiet 34px affordance, not a 50px icon competing
-   with the content it sits beside. */
-.animate-gear { font-size: 20px; }
-[x-data*="radioSettings"] > button { padding: 6px; }
+:root { --dock-h: 72px; }
+@media (max-width: 720px) { :root { --dock-h: 64px; } }
 
-/* ---------------------------------------------------------------------------
-   Phone chrome budget.
-
-   Before this, a 667px phone spent ~145px on three stacked control rows and
-   another 88px on a two-row dock: a third of the screen gone before a single
-   station. One row of controls, one row of dock.
-   --------------------------------------------------------------------------- */
-@media (max-width: 720px) {
-    :root { --dock-h: 64px; }
-
-    /* Favourites moves into the Filters sheet; on a phone the top row is
-       search plus one way in, nothing else. */
-    .nc-controls .nc-toggle:first-of-type { display: none; }
-
-    .nc-controls > div:first-child { padding: 10px 12px; gap: 8px; }
-    .nc-controls input[name="q"] { flex: 1 1 auto; min-width: 0; }
-
-    /* The genre strip is the one thing that earns its row here. */
-    .nc-controls .nc-pill { height: 34px; }
-
-    /* Rows get the space the chrome gave back. */
-    .nc-row { min-height: 60px; }
-    .nc-row-title { font-size: 16px; line-height: 21px; }
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
 }
+
+/* The settings control is an affordance, not an element of the composition. */
+[x-data*="radioSettings"] { padding: 14px 14px 0 0 !important; }
+[x-data*="radioSettings"] .animate-gear { font-size: 17px; }
+[x-data*="radioSettings"] > button { color: var(--color-faint); transition: color .16s ease; }
+[x-data*="radioSettings"] > button:hover { color: var(--color-paper); }

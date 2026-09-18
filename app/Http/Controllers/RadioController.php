@@ -22,11 +22,18 @@ class RadioController extends Controller
     {
         $filter = CatalogueFilter::fromRequest($request);
 
-        return view('radio.index', [
+        $shared = [
             'filter' => $filter,
             'radios' => $filter->paginate(),
+            'genres' => collect(config('radio-genres.genres'))
+                ->map(fn ($g, $slug) => ['slug' => $slug, 'label' => $g['label'], 'sort' => $g['sort']])
+                ->sortBy('sort')->values()->all(),
+            'genreCounts' => CatalogueCounts::genreCounts(),
+            'countries' => CatalogueCounts::countryCounts(),
             'languages' => CatalogueCounts::scopedLanguages($filter),
-        ]);
+        ];
+
+        return view('radio.index', $shared);
     }
 
     /**
