@@ -1,4 +1,4 @@
-<div class="mx-auto my-16 max-h-fit w-[90%] max-w-[1200px] max-[720px]:mb-24" x-show="!uiHidden">
+<div class="mx-auto my-16 max-h-fit w-full max-w-[1200px] max-[1200px]:w-[80%] max-[800px]:w-[90%] max-[720px]:mb-24" x-show="!uiHidden">
     <ul class="mx-auto flex w-full list-none flex-wrap items-center justify-center gap-4 p-0">
         @foreach ($radios as $radio)
             <li class="bg-menu text-app-text hover:bg-menu-hover flex h-auto w-[200px] cursor-pointer flex-row items-center justify-evenly rounded-[10px] p-2 transition-all duration-300 ease-in-out max-[720px]:w-[155px] max-[720px]:text-[.8rem]"
