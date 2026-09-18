@@ -62,7 +62,7 @@
     $genreCountsFallback ??= false;
 @endphp
 
-<div class="bg-menu sticky top-[56px] z-20 flex h-14 items-stretch border-b border-[color:color-mix(in_srgb,var(--color-app-text)_12%,transparent)] max-[640px]:h-11"
+<div class="flex h-14 items-stretch border-b border-[color:color-mix(in_srgb,var(--color-app-text)_12%,transparent)] max-[640px]:h-11"
      x-show="!uiHidden"
      x-data="{
          genreOverlayOpen: false,

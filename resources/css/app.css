@@ -765,3 +765,162 @@
 
 /* Nothing may cause a sideways scroll on a phone. */
 html, body { max-width: 100%; overflow-x: hidden; }
+
+/* ===========================================================================
+   THE ILLUMINATED DIAL
+
+   Replaces the near-black-plus-one-neon-accent pass, which was three of the
+   commonest generated-design tells at once: tinted near-black ground, a single
+   hot accent, tracked ALL-CAPS labels, and meta strings joined with middle dots.
+
+   The idea instead comes from the subject: a tuner's faceplate. Warm lamp light
+   behind glass, a dark bakelite surround, an engraved scale. Radio is a warm
+   medium, and every streaming interface is cold blue-black.
+
+   Two accents, each with one job:
+     lamp  — amber. Where the dial is pointing: the tuned station, the transport.
+     tally — studio red. ON AIR only. Never decoration.
+   =========================================================================== */
+:root,
+[data-theme='blue'], [data-theme='dark'], [data-theme='crimson'], [data-theme='light'] {
+    --color-app:        #17130f;   /* case: deep warm brown-black */
+    --color-menu:       #201b15;   /* glass: the lit panel */
+    --color-menu-hover: #2a231b;   /* glass, raised */
+    --color-btn:        #241e17;
+    --color-btn-hover:  #2f2820;
+    --color-btn-border: #3a3127;
+
+    --color-app-text:   #f2e8d5;   /* lamp through glass — warm ivory, not white */
+    --color-player:     #fdf7ea;
+    --color-button:     #f2e8d5;
+
+    --color-icon-hover: #f0b429;   /* the lamp */
+    --color-thumb:      #f0b429;
+    --color-gear:       #9a8d79;
+}
+
+.background::after {
+    background:
+        radial-gradient(75% 45% at 50% -12%, color-mix(in srgb, var(--color-icon-hover) 14%, transparent) 0%, transparent 64%),
+        radial-gradient(60% 40% at 12% 4%, color-mix(in srgb, #c96a2b 8%, transparent) 0%, transparent 58%);
+}
+
+@layer components {
+    .nc-pane {
+        background: color-mix(in srgb, var(--color-menu) 88%, transparent);
+        border: 1px solid #2c251d;
+        box-shadow:
+            0 1px 0 rgb(255 240 214 / .05) inset,
+            0 40px 90px -40px #000;
+    }
+
+    /* Captions: sentence case with normal tracking. Tracked-out uppercase
+       eyebrows are a generated-design tell and they slow reading. */
+    .nc-row-caption {
+        font-size: 11.5px;
+        line-height: 15px;
+        font-weight: 450;
+        letter-spacing: 0;
+        text-transform: none;
+        opacity: .42;
+        font-variant-numeric: tabular-nums;
+    }
+    .nc-count-line {
+        font-size: 12px;
+        letter-spacing: 0;
+        text-transform: none;
+        opacity: .40;
+    }
+    .nc-row-folio {
+        opacity: .22;
+        font-variant-numeric: tabular-nums;
+    }
+    .nc-row { border-bottom: 1px solid #241e17 !important; }
+    .nc-row:hover { background: #241e17; }
+
+    /* The tuned station: the lamp is behind it, not on it. */
+    .nc-row[aria-current='true'] {
+        background: linear-gradient(90deg,
+            color-mix(in srgb, var(--color-icon-hover) 13%, transparent) 0%,
+            transparent 62%);
+        box-shadow: inset 2px 0 0 var(--color-icon-hover);
+    }
+
+    #dock {
+        background: #13100c !important;
+        border-top: 1px solid #2c251d !important;
+        box-shadow: 0 -30px 70px -30px #000 !important;
+    }
+    .nc-dock-status { letter-spacing: 0; text-transform: none; opacity: .5; font-size: 11.5px; }
+
+    .nc-play {
+        background: var(--color-icon-hover);
+        color: #17130f;
+        box-shadow: 0 10px 26px -10px color-mix(in srgb, var(--color-icon-hover) 80%, transparent);
+    }
+    .nc-play:hover { background: #ffc24d; }
+
+    /* ON AIR: the only red on the page, and only when something is playing. */
+    .nc-meter.is-live span { background: #e2483d; }
+    .nc-meter span { background: color-mix(in srgb, var(--color-app-text) 30%, transparent); }
+
+    .nc-pill[aria-current='true'] {
+        background: color-mix(in srgb, var(--color-icon-hover) 16%, transparent);
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-icon-hover) 40%, transparent);
+    }
+    .nc-toggle:has(input:checked) { background: color-mix(in srgb, var(--color-icon-hover) 18%, transparent); }
+    .nc-toggle:has(input:checked)::before { background: var(--color-icon-hover); }
+
+    .volume-slider { background: #3a3127 !important; }
+    .volume-slider::-webkit-slider-thumb { background: var(--color-app-text); }
+    .volume-slider::-moz-range-thumb { background: var(--color-app-text); }
+}
+
+@layer components {
+    /* The control header stays at the top of the pane while the list scrolls
+       under it. It needs its own ground, or rows show through. */
+    .nc-controls {
+        background: color-mix(in srgb, var(--color-menu) 97%, transparent);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid #2c251d;
+        border-radius: 20px 20px 0 0;
+    }
+    @media (max-width: 720px) {
+        .nc-controls { border-radius: 0; }
+
+        /* Leave room for the settings control so it never sits on the genre
+           strip — on a 500px screen the gear was eating 155px of it. */
+        .nc-controls { padding-right: 46px; }
+    }
+}
+
+/* The settings control is a quiet 34px affordance, not a 50px icon competing
+   with the content it sits beside. */
+.animate-gear { font-size: 20px; }
+[x-data*="radioSettings"] > button { padding: 6px; }
+
+/* ---------------------------------------------------------------------------
+   Phone chrome budget.
+
+   Before this, a 667px phone spent ~145px on three stacked control rows and
+   another 88px on a two-row dock: a third of the screen gone before a single
+   station. One row of controls, one row of dock.
+   --------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+    :root { --dock-h: 64px; }
+
+    /* Favourites moves into the Filters sheet; on a phone the top row is
+       search plus one way in, nothing else. */
+    .nc-controls .nc-toggle:first-of-type { display: none; }
+
+    .nc-controls > div:first-child { padding: 10px 12px; gap: 8px; }
+    .nc-controls input[name="q"] { flex: 1 1 auto; min-width: 0; }
+
+    /* The genre strip is the one thing that earns its row here. */
+    .nc-controls .nc-pill { height: 34px; }
+
+    /* Rows get the space the chrome gave back. */
+    .nc-row { min-height: 60px; }
+    .nc-row-title { font-size: 16px; line-height: 21px; }
+}

@@ -309,11 +309,11 @@
 
     {{-- Mobile (§5.4), <= 640px, 88px, two rows, everything reachable in one tap. --}}
     <div class="hidden h-full w-full flex-col max-[640px]:flex">
-        <div class="flex h-[52px] items-center gap-3 px-4">
-            <div class="nc-bevel relative h-8 w-8 shrink-0 overflow-hidden rounded-[4px] bg-menu-hover"
+        <div class="flex h-full items-center gap-3 px-4">
+            <div class="relative h-11 w-11 shrink-0 overflow-hidden rounded-[8px] bg-menu-hover"
                  x-bind:class="!current ? 'nc-op-48' : ''">
                 <template x-if="current">
-                    <span class="nc-dock-monogram absolute inset-0 flex items-center justify-center text-[14px] leading-[14px]"
+                    <span class="nc-dock-monogram absolute inset-0 flex items-center justify-center text-[17px] leading-[17px]"
                           aria-hidden="true"
                           x-text="monogram(current.title)"></span>
                 </template>
@@ -366,7 +366,7 @@
             </div>
 
             <button type="button"
-                    class="nc-bevel flex h-11 w-11 shrink-0 items-center justify-center rounded-[4px] border border-btn-border bg-btn text-app-text text-[20px] disabled:pointer-events-none disabled:opacity-[.48]"
+                    class="nc-play flex h-12 w-12 shrink-0 items-center justify-center text-[19px] disabled:pointer-events-none disabled:opacity-[.48]"
                     x-bind:disabled="!current"
                     @click="current && toggle()"
                     x-bind:aria-label="isPlaying ? 'Pause' : 'Play'">
@@ -380,22 +380,5 @@
             </button>
         </div>
 
-        <div class="flex h-9 items-center gap-2 px-2">
-            <button type="button"
-                    class="nc-bevel flex h-9 w-9 shrink-0 items-center justify-center rounded-[4px] border border-btn-border bg-btn text-app-text text-[15px]"
-                    @click="previous()" aria-label="Previous station">
-                <x-icon.backward />
-            </button>
-            <button type="button"
-                    class="nc-bevel flex h-9 w-9 shrink-0 items-center justify-center rounded-[4px] border border-btn-border bg-btn text-app-text text-[14px]"
-                    @click="shuffle()" aria-label="Shuffle stations">
-                <x-icon.shuffle />
-            </button>
-            <input type="range" min="0" max="1" step="0.01"
-                   class="volume-slider flex-1"
-                   aria-label="Volume"
-                   x-model.number="volume"
-                   @input="setVolume($event.target.value)">
-        </div>
     </div>
 </div>

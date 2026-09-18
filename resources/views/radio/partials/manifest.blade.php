@@ -59,19 +59,19 @@
             $stream = collect([
                 $radio->bitrate ? $radio->bitrate.'k' : null,
                 $radio->codec,
-            ])->filter()->implode(' · ');
+            ])->filter()->implode('   ');
 
             // Cell 3's caption — Genre · Country · 128k · MP3 — with each
             // field omitted (never dashed, never "0") when absent, identical
             // at every width (§7.1).
-            $caption = collect([$genreCaption, $radio->country_code, $stream])->filter()->implode(' · ');
+            $caption = collect([$genreCaption, $radio->country_code, $stream])->filter()->implode('   ');
 
             // Votes and listener counts are sparse and mostly null, so they
             // leave the resting row and survive only as a tooltip (§7.1).
             $metaTooltip = collect([
                 ! is_null($radio->votes) ? number_format($radio->votes).' votes' : null,
                 ! is_null($radio->listeners) ? number_format($radio->listeners).' listeners' : null,
-            ])->filter()->implode(' · ');
+            ])->filter()->implode('   ');
         @endphp
         <li>
             <button type="button"

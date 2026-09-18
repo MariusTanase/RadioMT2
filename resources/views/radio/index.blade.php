@@ -69,8 +69,16 @@
            x-on:error="isPlaying = false"></audio>
 
     <main x-data="catalogue" class="nc-pane mx-auto mt-6 w-full max-w-[1120px] px-0 max-[720px]:mt-3 max-[720px]:rounded-none max-[720px]:border-x-0">
-        @include('radio.partials.tune-bar')
-        @include('radio.partials.genre-band')
+        {{--
+            The controls stay put. Previously they scrolled away with the page,
+            so on a phone anything past the first screenful left you with no
+            search, no filters and no genres — you had to scroll back up to
+            change anything.
+        --}}
+        <div class="nc-controls sticky top-0 z-30">
+            @include('radio.partials.tune-bar')
+            @include('radio.partials.genre-band')
+        </div>
 
         <div id="catalogue"
              x-bind:class="pending ? 'pointer-events-none opacity-45' : ''"

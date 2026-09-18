@@ -58,23 +58,11 @@
     --}}
     <script type="application/json" id="catalogue-stations">@json($stations)</script>
 
-    @if ($filter->tokens())
-        <div class="mb-3 flex flex-wrap items-center gap-2" role="list" aria-label="Active filters">
-            @foreach ($filter->tokens() as $token)
-                <a href="{{ $token['url'] }}"
-                   role="listitem"
-                   class="border-btn-border bg-btn text-app-text hover:bg-btn-hover font-opensans inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-[12px] font-semibold transition-colors duration-150">
-                    {{ $token['label'] }}
-                    <span aria-hidden="true">&times;</span>
-                </a>
-            @endforeach
-
-            <a href="{{ route('radio.index') }}"
-               class="text-app-text font-opensans text-[12px] font-semibold opacity-70 underline decoration-1 underline-offset-2 hover:opacity-100">
-                Clear all
-            </a>
-        </div>
-    @endif
+    {{--
+        The active-filter chips live in the tune bar, which is sticky, so they
+        stay reachable while the list scrolls. Rendering them here as well put
+        the same row on screen twice.
+    --}}
 
     {{-- Typography from the shared "Night Console" foundation: .nc-count-line is Sono 13/18/500 at 72%. --}}
     <p @class([
