@@ -18,7 +18,14 @@
 
     <script>
         // Applied before first paint so the chosen theme never flashes.
-        document.documentElement.dataset.bootTheme = localStorage.getItem('theme') ?? 'blue';
+        let bootTheme = 'blue';
+        try {
+            bootTheme = localStorage.getItem('theme') ?? 'blue';
+        } catch {
+            // localStorage can throw in some privacy/incognito configurations;
+            // fall back to the default theme rather than aborting the page.
+        }
+        document.documentElement.dataset.bootTheme = bootTheme;
     </script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
