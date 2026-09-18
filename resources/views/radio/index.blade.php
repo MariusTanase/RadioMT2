@@ -61,6 +61,20 @@
     --}}
     @include('radio.partials.deck')
 
+    {{--
+        The single audio element for the whole app. It lives here, outside
+        #catalogue, so a filter or page change never re-creates it and playback
+        survives navigation. isPlaying is driven only by the element's own
+        events — play() rejects when autoplay is blocked or a stream is dead,
+        and the transport must not claim to be playing in that case.
+    --}}
+    <audio x-ref="audio"
+           x-bind:src="current?.url"
+           preload="none"
+           @play="isPlaying = true"
+           @pause="isPlaying = false"
+           x-on:error="isPlaying = false"></audio>
+
     <main x-data="catalogue" class="mx-auto w-full max-w-[1200px] px-4 max-[720px]:mb-24">
         @include('radio.partials.tune-bar')
         @include('radio.partials.genre-band')
