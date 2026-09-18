@@ -37,11 +37,12 @@
       @keydown.window="onKeydown($event)">
     <script>
         document.body.dataset.theme = document.documentElement.dataset.bootTheme;
-        window.RADIO_STATIONS = @json($radios);
+        window.RADIO_STATIONS = @json($radios->items());
     </script>
 
     @include('radio.partials.background')
     @include('radio.partials.player')
+    @include('radio.partials.genre-picker')
     @include('radio.partials.radio-list')
     @include('radio.partials.settings')
     @include('radio.partials.footer')
