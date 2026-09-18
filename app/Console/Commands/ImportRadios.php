@@ -101,8 +101,15 @@ class ImportRadios extends Command
             $query['countrycode'] = strtoupper($country);
         }
 
+        // A full catalogue import is ~52 sequential requests to a third-party
+        // API. Without a retry a single transient blip aborts the whole run,
+        // and there is no --offset resume flag, so recovery means walking every
+        // page again from zero. throw:false keeps a genuinely failed page
+        // returning null so the caller still reports the offset and exits
+        // non-zero rather than raising.
         $response = Http::withHeaders(['User-Agent' => self::USER_AGENT])
             ->timeout(30)
+            ->retry(2, 1000, throw: false)
             ->get("https://{$this->option('server')}/json/stations/search", $query);
 
         return $response->successful() ? $response->json() : null;
