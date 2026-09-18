@@ -32,23 +32,31 @@
     @else
         <ul class="mx-auto flex w-full list-none flex-wrap items-center justify-center gap-4 p-0">
             @foreach ($radios as $radio)
-                <li class="bg-menu text-app-text hover:bg-menu-hover flex h-auto w-[200px] cursor-pointer flex-row items-center justify-evenly rounded-[10px] p-2 transition-all duration-300 ease-in-out max-[720px]:w-[155px] max-[720px]:text-[.8rem]"
+                {{--
+                    Fixed height, and the title is hard-clamped to two lines. Station names
+                    run to 255 characters in this catalogue ("WDR Sportschau - 2. Fussball
+                    Bundesliga-Konferenz LIVE" is 54 on page one alone); unclamped they made
+                    every card a different height and the grid went ragged.
+                --}}
+                <li class="bg-menu text-app-text hover:bg-menu-hover group flex h-[84px] w-[218px] cursor-pointer flex-row items-center gap-3 rounded-[10px] p-2.5 transition-colors duration-200 max-[720px]:h-[76px] max-[720px]:w-[168px]"
+                    title="{{ $radio->title }}"
                     @click="select({{ $radio->id }})">
-                    <div class="max-[720px]:flex-[1_0_50px]">
-                        <div class="relative h-[65px] w-[65px] max-[800px]:h-[75px] max-[800px]:w-[75px] max-[720px]:h-[50px] max-[720px]:w-[50px]">
-                            {{-- Monogram sits underneath; a missing or broken <img> simply reveals it. --}}
-                            <span class="bg-menu-hover text-app-text border-app-text absolute inset-0 flex items-center justify-center rounded-full border text-[22px] font-light"
-                                  aria-hidden="true">{{ $monogram($radio->title) }}</span>
+                    <div class="relative h-[56px] w-[56px] shrink-0 max-[720px]:h-[48px] max-[720px]:w-[48px]">
+                        {{-- Monogram sits underneath; a missing or broken <img> simply reveals it. --}}
+                        <span class="bg-menu-hover text-app-text border-app-text absolute inset-0 flex items-center justify-center rounded-full border text-[20px] font-light"
+                              aria-hidden="true">{{ $monogram($radio->title) }}</span>
 
-                            @if ($radio->image)
-                                <img class="absolute inset-0 h-full w-full rounded-full object-cover"
-                                     src="{{ $radio->image }}" alt="{{ $radio->title }}" loading="lazy"
-                                     onerror="this.remove()">
-                            @endif
-                        </div>
+                        @if ($radio->image)
+                            <img class="absolute inset-0 h-full w-full rounded-full object-cover"
+                                 src="{{ $radio->image }}" alt="" loading="lazy"
+                                 onerror="this.remove()">
+                        @endif
                     </div>
-                    <div class="max-[720px]:flex max-[720px]:w-full max-[720px]:flex-col max-[720px]:p-1">
-                        <h4 class="font-bold">{{ $radio->title }}</h4>
+                    <div class="flex min-w-0 flex-col justify-center gap-0.5">
+                        <h4 class="line-clamp-2 text-[13px] leading-[1.25] font-semibold break-words">{{ $radio->title }}</h4>
+                        @if ($radio->genre)
+                            <span class="truncate text-[11px] opacity-60">{{ $radio->genre }}</span>
+                        @endif
                     </div>
                 </li>
             @endforeach
