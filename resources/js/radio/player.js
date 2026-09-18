@@ -58,28 +58,32 @@ export default function radioPlayer() {
             this.isPlaying ? this.pause() : this.play();
         },
 
+        // Every station change defers play() to the next tick: `index` drives
+        // the <audio> src through a reactive binding, and Alpine flushes those
+        // asynchronously. Calling play() synchronously races the binding and
+        // replays the previous station's stream, or nothing at all.
         select(id) {
             const index = this.stations.findIndex((station) => station.id === id);
 
             if (index !== -1) {
                 this.index = index;
-                this.play();
+                this.$nextTick(() => this.play());
             }
         },
 
         next() {
             this.index = this.index === this.stations.length - 1 ? 0 : this.index + 1;
-            this.play();
+            this.$nextTick(() => this.play());
         },
 
         previous() {
             this.index = this.index === 0 ? this.stations.length - 1 : this.index - 1;
-            this.play();
+            this.$nextTick(() => this.play());
         },
 
         shuffle() {
             this.index = Math.floor(Math.random() * this.stations.length);
-            this.play();
+            this.$nextTick(() => this.play());
         },
 
         setVolume(value) {
