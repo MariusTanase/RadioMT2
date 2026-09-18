@@ -140,6 +140,10 @@ class ImportRadios extends Command
                 'title' => $this->truncate($this->clean((string) ($station['name'] ?? '')), 255),
                 'artist' => $label,
                 'genre' => $label,
+                // Keep the raw tag string. Without it, every taxonomy change
+                // means re-importing all ~49,000 stations from the API;
+                // with it, radios:remap-genres recomputes everything locally.
+                'tags' => $station['tags'] ?? '',
                 'image' => $this->truncate((string) ($station['favicon'] ?? ''), 2048),
                 'url' => $this->truncate($url, 2048),
                 'homepage' => $this->nullableString($station['homepage'] ?? null, 2048),
@@ -173,7 +177,7 @@ class ImportRadios extends Command
         Radio::upsert($rows, uniqueBy: ['station_uuid'], update: [
             'title', 'artist', 'genre', 'image', 'url', 'homepage', 'country',
             'country_code', 'language', 'codec', 'bitrate', 'votes',
-            'click_count', 'source', 'is_alive', 'checked_at',
+            'click_count', 'source', 'is_alive', 'checked_at', 'tags',
         ]);
 
         $this->syncGenres($genresByUuid, $genreIds);
