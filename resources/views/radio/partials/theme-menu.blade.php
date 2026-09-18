@@ -1,5 +1,5 @@
-<div class="flex w-full flex-col">
-    <h5 class="flex w-full flex-col text-base font-extrabold max-[720px]:text-2xl">
+<div class="font-opensans flex w-full flex-col">
+    <h5 class="font-sans flex w-full flex-col text-base font-extrabold max-[720px]:text-2xl">
         <p>Select Theme</p>
     </h5>
     <div class="mx-auto my-4 flex w-full flex-row flex-wrap items-center justify-center gap-4">

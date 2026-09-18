@@ -4,8 +4,8 @@
         <img class="border-app-text mx-auto mb-4 block h-[150px] w-[150px] rounded-full border border-solid object-cover"
              x-bind:src="current?.image"
              x-bind:alt="current ? `Image of ${current.title}` : ''">
-        <h2 class="mb-1 font-bold" x-text="current?.title"></h2>
-        <h3 class="mt-0 font-light" x-text="current ? `Genre: ${current.artist}` : ''"></h3>
+        <h2 class="mb-1 text-2xl font-bold" x-text="current?.title"></h2>
+        <h3 class="mt-0 text-[1.17em] font-bold" x-text="current ? `Genre: ${current.artist}` : ''"></h3>
     </div>
 
     <div class="mx-auto my-2 flex w-3/5 flex-col items-center justify-between gap-2.5">

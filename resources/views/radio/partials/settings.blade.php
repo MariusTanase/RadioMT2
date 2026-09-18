@@ -1,5 +1,6 @@
 <div class="text-app-text fixed top-0 right-0 z-100 flex h-auto w-fit flex-col items-center justify-center p-4 max-[720px]:top-auto max-[720px]:bottom-0 max-[720px]:left-0 max-[720px]:mx-auto max-[720px]:h-20 max-[720px]:w-full"
      x-data="radioSettings"
+     x-init="setBackground('mountain')"
      x-bind:class="menuOpen ? 'max-[720px]:bg-transparent' : 'max-[720px]:bg-menu'">
     <button class="text-app-text cursor-pointer border-none bg-none text-5xl outline-none transition-all duration-300 ease-in-out"
             x-show="!menuOpen" @click="open()" aria-label="Open settings">

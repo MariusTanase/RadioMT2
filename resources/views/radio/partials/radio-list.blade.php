@@ -8,7 +8,7 @@
                          src="{{ $radio->image }}" alt="{{ $radio->title }}" loading="lazy">
                 </div>
                 <div class="max-[720px]:flex max-[720px]:w-full max-[720px]:flex-col max-[720px]:p-1">
-                    <h4>{{ $radio->title }}</h4>
+                    <h4 class="font-bold">{{ $radio->title }}</h4>
                 </div>
             </li>
         @endforeach

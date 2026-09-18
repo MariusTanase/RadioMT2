@@ -1,5 +1,5 @@
-<div class="flex w-full flex-col">
-    <h5 class="flex w-full flex-col text-base font-extrabold max-[720px]:text-2xl">
+<div class="font-opensans flex w-full flex-col">
+    <h5 class="font-sans flex w-full flex-col text-base font-extrabold max-[720px]:text-2xl">
         Select Background
     </h5>
     <div class="mx-auto my-4 flex w-full flex-row flex-wrap items-center justify-center gap-4 max-[720px]:grid max-[720px]:grid-cols-2 max-[720px]:justify-items-center max-[720px]:gap-y-[1.4rem]">

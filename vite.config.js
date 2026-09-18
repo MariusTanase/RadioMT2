@@ -12,6 +12,9 @@ export default defineConfig({
                 bunny('Sono', {
                     weights: [300, 400, 500, 600, 700],
                 }),
+                bunny('Open Sans', {
+                    weights: [400, 600, 700],
+                }),
             ],
         }),
         tailwindcss(),

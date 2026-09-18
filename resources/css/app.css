@@ -5,6 +5,7 @@
 
 @theme {
     --font-sans: 'Sono', ui-sans-serif, system-ui, sans-serif;
+    --font-opensans: 'Open Sans', ui-sans-serif, system-ui, sans-serif;
 
     /* Defaults match the original :root block, which is the blue-ish base. */
     --color-app: hsla(0, 0%, 0%, 1);

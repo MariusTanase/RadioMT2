@@ -43,7 +43,7 @@ export default function radioSettings() {
                 }
 
                 const { url } = await response.json();
-                document.querySelector('.background').style.backgroundImage = `url(${url})`;
+                document.querySelector('.background').style.backgroundImage = `url("${url}")`;
             } catch {
                 // Leave the current background in place; the server already
                 // falls back to the bundled image when Unsplash is unavailable.

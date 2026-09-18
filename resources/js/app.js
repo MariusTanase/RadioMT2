@@ -10,4 +10,4 @@ Alpine.data('radioSettings', radioSettings);
 
 Alpine.start();
 
-initParticles('tsparticles');
+initParticles('tsparticles').catch(() => {});

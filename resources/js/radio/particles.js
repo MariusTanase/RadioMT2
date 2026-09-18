@@ -14,8 +14,7 @@ export async function initParticles(selector) {
                 opacity: { value: 0.8 },
                 size: { value: 4 },
                 rotate: {
-                    value: 0,
-                    random: true,
+                    value: { min: 0, max: 360 },
                     direction: 'clockwise',
                     animation: { enable: true, speed: 5, sync: false },
                 },

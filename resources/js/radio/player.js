@@ -23,7 +23,7 @@ export default function radioPlayer() {
             // hardcoded autoplays and is then replaced by the random pick.
             this.index = Math.floor(Math.random() * this.stations.length);
             this.setVolume(this.volume);
-            this.play();
+            this.$nextTick(() => this.play());
         },
 
         // Space toggles playback, but only when focus isn't inside a form
