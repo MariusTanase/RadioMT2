@@ -68,7 +68,7 @@
            @pause="isPlaying = false"
            x-on:error="isPlaying = false"></audio>
 
-    <main x-data="catalogue" class="mx-auto w-full max-w-[1200px] px-4">
+    <main x-data="catalogue" class="nc-pane mx-auto mt-6 w-full max-w-[1120px] px-0 max-[720px]:mt-3 max-[720px]:rounded-none max-[720px]:border-x-0">
         @include('radio.partials.tune-bar')
         @include('radio.partials.genre-band')
 

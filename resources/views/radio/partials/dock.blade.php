@@ -191,7 +191,12 @@
      class="fixed inset-x-0 bottom-0 z-40 h-[84px] max-[640px]:h-[88px]">
 
     {{-- Desktop (§5.3), >= 641px, 84px, three-cell grid. --}}
-    <div class="grid h-full grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 px-4 max-[640px]:hidden">
+    {{-- Inner content is constrained and centred to the same 1120px column as
+     the catalogue pane above it. Stretched edge-to-edge on a wide display
+     the 1fr cells put ~700px of dead space either side of the transport,
+     which is what made the dock read as an empty strip rather than an
+     object. --}}
+    <div class="mx-auto grid h-full w-full max-w-[1120px] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-6 px-5 max-[640px]:hidden">
 
         {{-- Left cell: the readout. --}}
         <div class="flex min-w-0 items-center gap-4">
@@ -212,6 +217,10 @@
             </div>
 
             <div class="min-w-0">
+                <span class="nc-meter mr-2 shrink-0 align-middle"
+                      x-bind:class="isPlaying ? 'is-live' : ''"
+                      aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+
                 <p class="nc-dock-name m-0 truncate"
                    x-bind:class="!current || dockState === 'failed' ? 'nc-op-72' : 'nc-op-100'"
                    x-bind:title="current?.title ?? ''"
@@ -261,7 +270,7 @@
             </button>
 
             <button type="button"
-                    class="nc-bevel flex h-12 w-12 items-center justify-center rounded-[4px] border-r border-r-btn-border text-app-text text-[22px] hover:text-icon-hover disabled:pointer-events-none disabled:opacity-[.48]"
+                    class="nc-play mx-1 flex h-12 w-12 items-center justify-center text-[20px] disabled:pointer-events-none disabled:opacity-[.48]"
                     x-bind:disabled="!current"
                     @click="current && toggle()"
                     x-bind:aria-label="isPlaying ? 'Pause' : 'Play'">
