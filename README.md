@@ -112,3 +112,18 @@ the full write-up of each bug and its fix.
 php -c php.ini vendor/bin/pest      # test suite
 php -c php.ini vendor/bin/pint --test   # style check (no --test to auto-fix)
 ```
+
+### PHP HTTPS and the CA bundle
+
+The project-root `php.ini` must point cURL at a certificate bundle, or every
+outbound HTTPS request fails with `cURL error 60: SSL certificate problem:
+unable to get local issuer certificate` — which breaks `radios:import` and the
+Unsplash background endpoint:
+
+```ini
+curl.cainfo = "C:/laragon/etc/ssl/cacert.pem"
+openssl.cafile = "C:/laragon/etc/ssl/cacert.pem"
+```
+
+`php.ini` is gitignored because its paths are machine-specific, so this is easy
+to lose when setting the project up on another machine.
