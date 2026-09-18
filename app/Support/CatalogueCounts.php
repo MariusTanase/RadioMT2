@@ -93,6 +93,51 @@ class CatalogueCounts
             ->all();
     }
 
+    /**
+     * Languages present in the CURRENT filtered set, with counts.
+     *
+     * Deliberately not cached: it depends on every active filter, so a cache
+     * key would have to encode the whole filter and would almost never hit.
+     * One grouped query against the already-filtered set is cheaper than
+     * maintaining that.
+     */
+    /**
+     * The most common languages, capped — the raw field holds comma-joined
+     * values ("english,german"), so an uncapped list is 1,281 entries and
+     * useless as a dropdown.
+     */
+    private const LANGUAGE_LIMIT = 40;
+
+    public static function scopedLanguages(CatalogueFilter $filter): array
+    {
+        // With no filter active this is the same query for every visitor and
+        // costs ~104ms, so serve it from the 24h cache instead.
+        if (! $filter->isActive()) {
+            return Cache::remember(
+                'catalogue:languages-top',
+                now()->addDay(),
+                fn () => self::languageQuery($filter)
+            );
+        }
+
+        return self::languageQuery($filter);
+    }
+
+    /** @return array<string, int> */
+    private static function languageQuery(CatalogueFilter $filter): array
+    {
+        return $filter->query()
+            ->reorder()
+            ->whereNotNull('language')
+            ->where('language', '!=', '')
+            ->groupBy('language')
+            ->selectRaw('language, COUNT(*) as aggregate')
+            ->orderByDesc('aggregate')
+            ->limit(self::LANGUAGE_LIMIT)
+            ->pluck('aggregate', 'language')
+            ->all();
+    }
+
     public static function flush(): void
     {
         Cache::forget(self::GENRE_KEY);

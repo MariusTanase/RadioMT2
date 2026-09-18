@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Radio;
+use App\Support\CatalogueCounts;
 use App\Support\CatalogueFilter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -24,6 +25,7 @@ class RadioController extends Controller
         return view('radio.index', [
             'filter' => $filter,
             'radios' => $filter->paginate(),
+            'languages' => CatalogueCounts::scopedLanguages($filter),
         ]);
     }
 

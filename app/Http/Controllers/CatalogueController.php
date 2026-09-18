@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\CatalogueCounts;
 use App\Support\CatalogueFilter;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
@@ -22,6 +23,7 @@ class CatalogueController extends Controller
         return view('radio.partials.catalogue', [
             'filter' => $filter,
             'radios' => $filter->paginate(),
+            'languages' => CatalogueCounts::scopedLanguages($filter),
         ]);
     }
 
