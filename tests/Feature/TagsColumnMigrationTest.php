@@ -16,13 +16,18 @@ it('adds a nullable, unindexed tags column to radios', function () {
 });
 
 it('rolls back the tags column cleanly and can be re-migrated', function () {
-    Artisan::call('migrate:rollback', ['--step' => 1]);
+    // --step counts migrations, not "the tags one" specifically: roll back
+    // the two most recent (play_count, then tags) so this keeps working
+    // regardless of what gets added after the tags migration.
+    Artisan::call('migrate:rollback', ['--step' => 2]);
 
     expect(Schema::hasColumn('radios', 'tags'))->toBeFalse();
+    expect(Schema::hasColumn('radios', 'play_count'))->toBeFalse();
     // The rest of the radios table survives the rollback untouched.
     expect(Schema::hasColumn('radios', 'genre'))->toBeTrue();
 
     Artisan::call('migrate');
 
     expect(Schema::hasColumn('radios', 'tags'))->toBeTrue();
+    expect(Schema::hasColumn('radios', 'play_count'))->toBeTrue();
 });

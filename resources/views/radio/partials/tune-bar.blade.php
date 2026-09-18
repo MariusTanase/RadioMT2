@@ -57,7 +57,8 @@
     $countrySelectName = $filter->region !== null ? 'region' : 'country';
 
     $sortOptions = [
-        'played' => 'Most played',
+        'played' => 'Most played here',
+        'popular' => 'Popular worldwide',
         'voted' => 'Most voted',
         'bitrate' => 'Highest bitrate',
         'az' => 'A–Z',

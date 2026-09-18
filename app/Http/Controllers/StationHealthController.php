@@ -34,6 +34,11 @@ class StationHealthController extends Controller
             'local_checked_at' => now(),
         ])->save();
 
+        // Atomic column increment (UPDATE ... SET play_count = play_count + 1)
+        // rather than read-modify-write, so two listeners starting the same
+        // station at the same moment both get counted.
+        $radio->increment('play_count');
+
         return response()->noContent();
     }
 }

@@ -15,7 +15,7 @@ class Radio extends Model
     protected $fillable = [
         'station_uuid', 'title', 'artist', 'genre', 'tags', 'image', 'url',
         'country', 'country_code', 'language', 'homepage', 'codec', 'bitrate',
-        'votes', 'click_count', 'source', 'is_favourite', 'is_alive', 'checked_at',
+        'votes', 'click_count', 'play_count', 'source', 'is_favourite', 'is_alive', 'checked_at',
         'local_ok', 'local_checked_at', 'listeners', 'listener_peak',
         'probed_at', 'probe_ok',
     ];

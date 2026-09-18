@@ -23,7 +23,7 @@ class CatalogueFilter
     /** Stations rendered per page (spec: 50 rows per page). */
     public const PER_PAGE = 50;
 
-    private const SORTS = ['played', 'voted', 'bitrate', 'az', 'country'];
+    private const SORTS = ['played', 'popular', 'voted', 'bitrate', 'az', 'country'];
 
     public readonly ?string $q;
 
@@ -180,9 +180,20 @@ class CatalogueFilter
     }
 
     /**
-     * Every sort ends in id ASC. Without a unique tiebreaker, rows shift
-     * between pages whenever the leading column ties — and at ~50,000 rows
-     * click_count ties constantly, so page 2 would silently repeat and skip
+     * Every sort ends in title ASC, id ASC — except `az`, which already
+     * sorts by title and keeps id ASC as its own unique tiebreak.
+     *
+     * `title` (not `id`) is the second-to-last column deliberately: with
+     * `click_count` at 0 or near-0 for most of the catalogue, the old
+     * `id ASC` final tiebreak made the tail of every sort read as raw
+     * import order — indistinguishable from no sort at all. Ending in
+     * `title ASC` instead turns that flat tail into a browsable
+     * alphabetical run.
+     *
+     * `title` alone isn't unique, so `id ASC` still comes after it as the
+     * true final tiebreak — without a unique tiebreaker, rows shift between
+     * pages whenever every other column ties, and at ~50,000 rows that
+     * happens constantly, so page 2 would silently repeat and skip
      * stations.
      *
      * @param  Builder<Radio>  $query
@@ -191,16 +202,20 @@ class CatalogueFilter
     private function applySort(Builder $query): Builder
     {
         return match ($this->sort) {
-            'voted' => $query->orderByDesc('votes')->orderByDesc('click_count')->orderBy('id'),
-            'bitrate' => $query->orderByDesc('bitrate')->orderByDesc('click_count')->orderBy('id'),
+            // Local play count first; falls back to click_count while
+            // play_count is still zero everywhere, which is today's
+            // behaviour and the reason `played` stays the default sort.
+            'popular' => $query->orderByDesc('click_count')->orderByDesc('votes')->orderBy('title')->orderBy('id'),
+            'voted' => $query->orderByDesc('votes')->orderByDesc('click_count')->orderBy('title')->orderBy('id'),
+            'bitrate' => $query->orderByDesc('bitrate')->orderByDesc('click_count')->orderBy('title')->orderBy('id'),
             'az' => $query->orderBy('title')->orderBy('id'),
             // `country` is nullable on imported rows. Ordered explicitly via
             // `country IS NULL` (0/1) rather than relying on the engine's
             // default NULL placement, because that default is not guaranteed
             // to agree between MySQL (production) and SQLite (tests) — this
             // form is verified identical on both and puts nulls last.
-            'country' => $query->orderByRaw('country is null')->orderBy('country')->orderByDesc('click_count')->orderBy('id'),
-            default => $query->orderByDesc('click_count')->orderByDesc('votes')->orderBy('id'),
+            'country' => $query->orderByRaw('country is null')->orderBy('country')->orderByDesc('click_count')->orderBy('title')->orderBy('id'),
+            default => $query->orderByDesc('play_count')->orderByDesc('click_count')->orderBy('title')->orderBy('id'),
         };
     }
 

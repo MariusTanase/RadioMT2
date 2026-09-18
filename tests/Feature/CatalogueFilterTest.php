@@ -43,7 +43,7 @@ it('ignores an unknown sort and falls back to played', function () {
 });
 
 it('accepts every documented sort', function () {
-    foreach (['played', 'voted', 'bitrate', 'az', 'country'] as $sort) {
+    foreach (['played', 'popular', 'voted', 'bitrate', 'az', 'country'] as $sort) {
         expect(filterFor(['sort' => $sort])->sort)->toBe($sort);
     }
 });
