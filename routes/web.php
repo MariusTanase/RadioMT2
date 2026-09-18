@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BackgroundController;
 use App\Http\Controllers\CatalogueController;
+use App\Http\Controllers\NowPlayingController;
 use App\Http\Controllers\RadioController;
 use App\Http\Controllers\StationHealthController;
 use Illuminate\Support\Facades\Route;
@@ -24,5 +25,14 @@ Route::post('/api/stations/{radio}/unreachable', [StationHealthController::class
 
 Route::post('/api/stations/{radio}/ok', [StationHealthController::class, 'ok'])
     ->name('stations.ok')
+    ->middleware('throttle:20,1')
+    ->missing(fn () => response()->noContent());
+
+// Same `missing()` telemetry pattern as above: an unknown station id gets a
+// bare 204 rather than a 404, so a probing client learns nothing. This one
+// is a pure cache read (§6.5 of the redesign direction) — see
+// NowPlayingController for why it never blocks on the network.
+Route::get('/api/stations/{radio}/now-playing', [NowPlayingController::class, 'show'])
+    ->name('stations.now-playing')
     ->middleware('throttle:20,1')
     ->missing(fn () => response()->noContent());
