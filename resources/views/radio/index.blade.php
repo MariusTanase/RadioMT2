@@ -23,7 +23,11 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-app text-app-text m-0 min-h-screen w-full font-sans" data-theme="blue">
+<body class="bg-app text-app-text m-0 min-h-screen w-full font-sans"
+      data-theme="blue"
+      x-data="radioPlayer"
+      x-init="boot()"
+      @keydown.window="onKeydown($event)">
     <script>
         document.body.dataset.theme = document.documentElement.dataset.bootTheme;
         window.RADIO_STATIONS = @json($radios);
