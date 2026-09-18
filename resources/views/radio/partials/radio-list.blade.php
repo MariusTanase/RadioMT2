@@ -6,6 +6,15 @@
 
         return $letters === '' ? '?' : mb_strtoupper(mb_substr($letters, 0, 1));
     };
+
+    // Stations are legitimately multi-genre: one real row carries
+    // [pop, dance, electronic, house, hip-hop]. `radios.genre` stores only the
+    // first match in taxonomy order, so filtering House used to show cards
+    // captioned "Pop". When a genre filter is active the caption must name the
+    // genre you actually filtered by, or the page looks broken while being right.
+    $activeGenreName = $activeGenre
+        ? ($genres->firstWhere('slug', $activeGenre)?->name ?? $activeGenre)
+        : null;
 @endphp
 
 <div class="mx-auto my-8 max-h-fit w-full max-w-[1200px] max-[1200px]:w-[80%] max-[800px]:w-[90%] max-[720px]:mb-24"
@@ -16,7 +25,7 @@
         {{ number_format($radios->total()) }}
         {{ Str::plural('station', $radios->total()) }}
         @if ($activeGenre)
-            in {{ $genres->firstWhere('slug', $activeGenre)?->name ?? $activeGenre }}
+            in {{ $activeGenreName }}
         @endif
         @if ($radios->lastPage() > 1)
             · page {{ number_format($radios->currentPage()) }} of {{ number_format($radios->lastPage()) }}
@@ -54,8 +63,8 @@
                     </div>
                     <div class="flex min-w-0 flex-col justify-center gap-0.5">
                         <h4 class="line-clamp-2 text-[13px] leading-[1.25] font-semibold break-words">{{ $radio->title }}</h4>
-                        @if ($radio->genre)
-                            <span class="truncate text-[11px] opacity-60">{{ $radio->genre }}</span>
+                        @if ($activeGenreName ?? $radio->genre)
+                            <span class="truncate text-[11px] opacity-60">{{ $activeGenreName ?? $radio->genre }}</span>
                         @endif
                     </div>
                 </li>
