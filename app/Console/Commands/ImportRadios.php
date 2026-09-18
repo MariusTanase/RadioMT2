@@ -127,8 +127,12 @@ class ImportRadios extends Command
         foreach ($stations as $station) {
             $uuid = trim((string) ($station['stationuuid'] ?? ''));
             $url = $this->pickUrl($station);
+            $title = $this->truncate($this->clean((string) ($station['name'] ?? '')), 255);
 
-            if ($uuid === '' || $url === '') {
+            // A station with no name cannot be listed, searched or recognised.
+            // Two such rows existed in the catalogue and sorted to the very top
+            // of A-Z, so the alphabetical view opened with blank lines.
+            if ($uuid === '' || $url === '' || $title === '') {
                 continue;
             }
 
@@ -137,7 +141,7 @@ class ImportRadios extends Command
 
             $rows[] = [
                 'station_uuid' => $uuid,
-                'title' => $this->truncate($this->clean((string) ($station['name'] ?? '')), 255),
+                'title' => $title,
                 'artist' => $label,
                 'genre' => $label,
                 // Keep the raw tag string. Without it, every taxonomy change
