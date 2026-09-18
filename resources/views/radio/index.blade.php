@@ -35,15 +35,43 @@
       x-data="radioPlayer"
       x-init="boot()"
       @keydown.window="onKeydown($event)">
+    @php
+        // Only what the player binds against. This is the initial page load's
+        // equivalent of the #catalogue-stations island the fragment emits.
+        $bootStations = $radios->getCollection()->map(fn ($station) => [
+            'id' => $station->id,
+            'title' => $station->title,
+            'genre' => $station->genre,
+            'image' => $station->image,
+            'url' => $station->url,
+        ])->values();
+    @endphp
+
     <script>
         document.body.dataset.theme = document.documentElement.dataset.bootTheme;
-        window.RADIO_STATIONS = @json($radios->items());
+        window.RADIO_STATIONS = @json($bootStations);
     </script>
 
     @include('radio.partials.background')
-    @include('radio.partials.player')
-    @include('radio.partials.genre-picker')
-    @include('radio.partials.radio-list')
+
+    {{--
+        The Deck, the Tune bar and the audio element sit OUTSIDE #catalogue.
+        That is what keeps playback alive across a filter or page change:
+        catalogue.js only ever replaces the contents of #catalogue.
+    --}}
+    @include('radio.partials.deck')
+
+    <main x-data="catalogue" class="mx-auto w-full max-w-[1200px] px-4 max-[720px]:mb-24">
+        @include('radio.partials.tune-bar')
+        @include('radio.partials.genre-band')
+
+        <div id="catalogue"
+             x-bind:class="pending ? 'pointer-events-none opacity-45' : ''"
+             class="transition-opacity duration-200">
+            @include('radio.partials.catalogue')
+        </div>
+    </main>
+
     @include('radio.partials.settings')
     @include('radio.partials.footer')
 </body>

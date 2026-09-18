@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Genre;
 use App\Models\Radio;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
+use App\Support\CatalogueFilter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -13,65 +11,62 @@ use Illuminate\View\View;
 class RadioController extends Controller
 {
     /**
-     * Stations rendered per page.
+     * The full page: the Deck, the Tune bar, and the #catalogue fragment.
      *
-     * The catalogue holds ~49,000 stations. Rendering them all cost 174MB against
-     * a 128MB limit — the page returned HTTP 500 — and embedded a 9.7MB JSON blob.
-     * Every path through this controller is paginated for that reason.
+     * The fragment partial is shared with CatalogueController, which renders it
+     * alone for AJAX swaps. One template, two entry points — so a deep link and
+     * a navigated view can never drift apart.
      */
-    private const PER_PAGE = 50;
-
     public function index(Request $request): View
     {
-        $genre = $this->genre($request);
+        $filter = CatalogueFilter::fromRequest($request);
 
         return view('radio.index', [
-            'radios' => $this->query($genre)->paginate(self::PER_PAGE)->withQueryString(),
-            'genres' => Genre::query()->orderBy('sort_order')->get(['id', 'name', 'slug']),
-            'activeGenre' => $genre,
+            'filter' => $filter,
+            'radios' => $filter->paginate(),
         ]);
     }
 
+    /**
+     * JSON list, paged the same way as the page.
+     *
+     * The catalogue holds ~58,000 stations; serialising all of them was a 9.7MB
+     * response that exhausted the 128MB memory limit.
+     */
     public function list(Request $request): JsonResponse
     {
-        $page = max(1, (int) $request->query('page', '1'));
+        $filter = CatalogueFilter::fromRequest($request);
 
         return response()->json(
-            $this->query($this->genre($request))
-                ->forPage($page, self::PER_PAGE)
+            $filter->query()
+                ->forPage($filter->page, CatalogueFilter::PER_PAGE)
                 ->get(['id', 'title', 'artist', 'genre', 'image', 'url'])
         );
     }
 
     /**
-     * An unknown slug is ignored rather than fatal — this page is public and
-     * reachable by hand-edited URL and by crawler.
+     * One random station from the whole filtered set.
+     *
+     * Kept as an alias of the catalogue endpoint so an older client calling
+     * this path still shuffles across the full tuned set rather than the page
+     * it happens to be holding.
      */
-    private function genre(Request $request): ?string
+    public function random(Request $request): JsonResponse
     {
-        $genre = $request->query('genre');
+        $radio = CatalogueFilter::fromRequest($request)
+            ->query()
+            ->reorder()
+            ->inRandomOrder()
+            ->first();
 
-        if (! is_string($genre) || ! array_key_exists($genre, config('radio-genres.genres', []))) {
-            return null;
-        }
+        abort_if($radio === null, 404);
 
-        return $genre;
+        return response()->json($radio->only(['id', 'title', 'genre', 'image', 'url']));
     }
 
-    /** @return Builder<Radio> */
-    private function query(?string $genre): Builder
+    /** Kept for the model-bound route registered elsewhere. */
+    public function show(Radio $radio): JsonResponse
     {
-        return Radio::query()
-            ->when($genre, fn (Builder $q, string $slug) => $q->whereHas(
-                'genres',
-                fn (Builder $g) => $g->where('slug', $slug)
-            ))
-            ->orderBy('id');
-    }
-
-    /** @return LengthAwarePaginator<int, Radio> */
-    public function paginator(Request $request): LengthAwarePaginator
-    {
-        return $this->query($this->genre($request))->paginate(self::PER_PAGE);
+        return response()->json($radio->only(['id', 'title', 'genre', 'image', 'url']));
     }
 }
