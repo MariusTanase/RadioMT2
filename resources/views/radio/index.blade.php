@@ -12,9 +12,14 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
     <link rel="manifest" href="{{ asset('site.webmanifest') }}">
 
+    <script>
+        // Applied before first paint so a chosen theme never flashes.
+        try { const t = localStorage.getItem('theme'); document.documentElement.dataset.boot = ['brass','ember','ice','moss','mono'].includes(t) ? t : 'brass'; } catch { document.documentElement.dataset.boot = 'brass'; }
+    </script>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body x-data="radioPlayer" x-init="boot()" @keydown.window="onKeydown($event)">
+<body x-data="radioPlayer" data-theme="brass" x-init="boot()" @keydown.window="onKeydown($event)">
 
 @php
     $bootStations = $radios->getCollection()->map(fn ($s) => [
@@ -22,6 +27,10 @@
         'image' => $s->image, 'url' => $s->url,
     ])->values();
 @endphp
+<script>
+    document.body.dataset.theme = document.documentElement.dataset.boot;
+    try { if (localStorage.getItem('spectrum') === '0') document.body.classList.add('no-spectrum'); } catch {}
+</script>
 <script>window.RADIO_STATIONS = @json($bootStations);</script>
 
 {{-- One audio element for the whole app, outside the swappable region so a

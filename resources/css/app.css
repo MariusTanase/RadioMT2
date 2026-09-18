@@ -341,3 +341,152 @@ body::before {
 [x-data*="radioSettings"] .animate-gear { font-size: 17px; }
 [x-data*="radioSettings"] > button { color: var(--color-faint); transition: color .16s ease; }
 [x-data*="radioSettings"] > button:hover { color: var(--color-paper); }
+
+/* ===========================================================================
+   ATMOSPHERE, THEMES, AND THE DOCK
+   =========================================================================== */
+
+/* --- five palettes, each a different hour of the night -------------------- */
+[data-theme='brass'], :root {
+    --color-ink: #0e0d0b; --color-ink-lift: #171511; --color-rule: #262219;
+    --color-paper: #f0e9dd; --color-mute: #938a7b; --color-faint: #5f584b;
+    --color-brass: #d2a24c; --color-onair: #e0574a;
+    --aura-1: 210 162 76; --aura-2: 120 86 40;
+}
+[data-theme='ember'] {
+    --color-ink: #120b0b; --color-ink-lift: #1d1111; --color-rule: #2e1c1a;
+    --color-paper: #f4e6e2; --color-mute: #9c8079; --color-faint: #6a5048;
+    --color-brass: #ef6b4a; --color-onair: #ffb03a;
+    --aura-1: 239 107 74; --aura-2: 120 40 30;
+}
+[data-theme='ice'] {
+    --color-ink: #080b10; --color-ink-lift: #0f151d; --color-rule: #1a2330;
+    --color-paper: #e4edf6; --color-mute: #7d8b9c; --color-faint: #4d5a69;
+    --color-brass: #6fb6ff; --color-onair: #ff5d7a;
+    --aura-1: 111 182 255; --aura-2: 40 70 120;
+}
+[data-theme='moss'] {
+    --color-ink: #080d0a; --color-ink-lift: #0f1712; --color-rule: #1a2620;
+    --color-paper: #e4f0e7; --color-mute: #7d9487; --color-faint: #4c6154;
+    --color-brass: #6fd39b; --color-onair: #ff7a5d;
+    --aura-1: 111 211 155; --aura-2: 30 90 60;
+}
+[data-theme='mono'] {
+    --color-ink: #0b0b0c; --color-ink-lift: #141416; --color-rule: #232326;
+    --color-paper: #ededf0; --color-mute: #8a8a90; --color-faint: #57575d;
+    --color-brass: #ededf0; --color-onair: #ff5d5d;
+    --aura-1: 200 200 210; --aura-2: 70 70 80;
+}
+
+/* --- the aura: a slow living backdrop, not a photograph ------------------- */
+body::before {
+    background:
+        radial-gradient(52% 38% at 22% 8%,  rgb(var(--aura-1) / .16) 0%, transparent 62%),
+        radial-gradient(46% 34% at 82% 4%,  rgb(var(--aura-2) / .16) 0%, transparent 60%),
+        radial-gradient(60% 40% at 50% 104%, rgb(var(--aura-1) / .10) 0%, transparent 64%);
+    animation: aura 28s ease-in-out infinite alternate;
+}
+@keyframes aura {
+    0%   { transform: translate3d(0,0,0) scale(1);      filter: hue-rotate(0deg); }
+    50%  { transform: translate3d(-2%,1.5%,0) scale(1.06); }
+    100% { transform: translate3d(2%,-1%,0) scale(1.03); filter: hue-rotate(8deg); }
+}
+
+/* A faint engraved grid — the faceplate behind everything. Costs one gradient
+   and gives the flat ground something to be flat against. */
+body::after {
+    content: '';
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+        repeating-linear-gradient(90deg, rgb(var(--aura-1) / .035) 0 1px, transparent 1px 64px);
+    mask-image: radial-gradient(70% 55% at 50% 0%, #000 0%, transparent 78%);
+}
+
+@layer components {
+    /* --- dock ------------------------------------------------------------ */
+    .dock {
+        position: fixed; inset-inline: 0; bottom: 0; z-index: 40;
+        height: var(--dock-h);
+        background: var(--color-ink-lift);
+        box-shadow: 0 -24px 48px -24px #000;
+        border-top: 1px solid var(--color-rule);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        overflow: hidden;
+    }
+    .dock-spectrum {
+        position: absolute; inset: 0;
+        width: 100%; height: 100%;
+        opacity: .38;
+        pointer-events: none;
+        mask-image: linear-gradient(to right, transparent 0, #000 18%, #000 82%, transparent 100%);
+    }
+    .dock-in {
+        position: relative; z-index: 1;
+        display: grid;
+        grid-template-columns: minmax(0,1fr) auto minmax(0,1fr);
+        align-items: center; gap: 20px;
+        height: var(--dock-h);
+        max-width: 880px; margin-inline: auto; padding-inline: 28px;
+    }
+    .dock-now { display: flex; align-items: center; gap: 13px; min-width: 0; }
+    .dock-text { min-width: 0; }
+    .dock-transport { display: flex; align-items: center; gap: 6px; }
+    .dock-aux { display: flex; align-items: center; justify-content: flex-end; gap: 14px; }
+
+    .dock-art {
+        width: 46px; height: 46px; flex: none; position: relative; overflow: hidden;
+        border-radius: 6px; background: var(--color-rule);
+        display: grid; place-items: center;
+        font-size: 17px; font-weight: 500; color: var(--color-faint);
+        box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-paper) 8%, transparent);
+        transition: box-shadow .3s ease;
+    }
+    .dock-art.is-live { box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-brass) 55%, transparent), 0 0 22px -4px rgb(var(--aura-1) / .55); }
+    .dock-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+    .dock-name  { display:block; font-size: 15px; font-weight: 550; color: var(--color-paper); letter-spacing: -.01em; }
+    .dock-track { display:block; font-size: 12px; color: var(--color-brass); }
+    .dock-track.dock-dim { color: var(--color-faint); }
+    .dock-idle  { font-size: 13px; color: var(--color-faint); }
+
+    @media (max-width: 720px) {
+        .dock-in { grid-template-columns: minmax(0,1fr) auto; gap: 10px; padding-inline: 16px; }
+        .dock-aux { display: none; }
+        .dock-art { width: 40px; height: 40px; }
+        .dock-spectrum { opacity: .3; }
+    }
+
+    /* --- theme picker ---------------------------------------------------- */
+    .swatches { display: flex; gap: 10px; flex-wrap: wrap; }
+    .swatch {
+        width: 30px; height: 30px; border-radius: 999px; cursor: pointer;
+        border: 1px solid color-mix(in srgb, var(--color-paper) 18%, transparent);
+        position: relative; padding: 0;
+        transition: transform .14s ease, box-shadow .14s ease;
+    }
+    .swatch:hover { transform: scale(1.08); }
+    .swatch[aria-pressed='true'] { box-shadow: 0 0 0 2px var(--color-brass); }
+    .swatch:focus-visible { outline: 2px solid var(--color-brass); outline-offset: 2px; }
+}
+
+@layer components {
+    .settings-root { position: fixed; top: 0; right: 0; z-index: 60; padding: 14px 14px 0 0; }
+    .settings-btn {
+        width: 34px; height: 34px; border: 0; background: transparent; cursor: pointer;
+        color: var(--color-faint); font-size: 17px;
+        display: grid; place-items: center; border-radius: 999px;
+        transition: color .16s ease;
+    }
+    .settings-btn:hover { color: var(--color-paper); }
+    .settings-btn:focus-visible { outline: 2px solid var(--color-brass); outline-offset: 2px; }
+    .settings-panel {
+        position: absolute; top: 52px; right: 14px;
+        width: 224px; padding: 16px;
+        background: color-mix(in srgb, var(--color-ink) 94%, transparent);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--color-rule); border-radius: 12px;
+        box-shadow: 0 24px 60px -20px #000;
+    }
+    .settings-h { font-size: 11px; font-weight: 600; letter-spacing: .1em; color: var(--color-faint); margin: 0 0 10px; }
+    .no-spectrum .dock-spectrum { display: none; }
+}

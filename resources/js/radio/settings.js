@@ -1,6 +1,6 @@
 function readStoredTheme() {
     try {
-        return localStorage.getItem('theme') ?? 'blue';
+        return (THEMES.includes(localStorage.getItem('theme')) ? localStorage.getItem('theme') : 'brass');
     } catch {
         return 'blue';
     }
@@ -15,9 +15,18 @@ function writeStoredTheme(name) {
     }
 }
 
+const THEMES = ['brass', 'ember', 'ice', 'moss', 'mono'];
+
 export default function radioSettings() {
     return {
         menuOpen: false,
+        showSpectrum: (() => { try { return localStorage.getItem('spectrum') !== '0'; } catch { return true; } })(),
+
+        applySpectrum() {
+            document.body.classList.toggle('no-spectrum', !this.showSpectrum);
+            try { localStorage.setItem('spectrum', this.showSpectrum ? '1' : '0'); } catch {}
+        },
+
         theme: readStoredTheme(),
 
         open() {
