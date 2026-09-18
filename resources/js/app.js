@@ -1,5 +1,6 @@
 import Alpine from 'alpinejs';
 import catalogue from './radio/catalogue';
+import './radio/now-playing';
 import radioPlayer from './radio/player';
 import radioSettings from './radio/settings';
 import { initParticles } from './radio/particles';
