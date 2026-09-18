@@ -6,12 +6,12 @@ function mapper(): GenreMapper
 {
     return new GenreMapper([
         'genres' => [
-            'pop' => ['label' => 'Pop', 'sort' => 10, 'tags' => ['pop', 'pop music', 'musica pop']],
+            'pop' => ['label' => 'Pop', 'sort' => 10, 'tags' => ['pop', 'pop music', 'musica pop', 'pop rock']],
             'rock' => ['label' => 'Rock', 'sort' => 20, 'tags' => ['rock', 'pop rock']],
             'latin' => ['label' => 'Latin', 'sort' => 30, 'tags' => ['regional mexicana']],
             'other' => ['label' => 'Other', 'sort' => 999, 'tags' => []],
         ],
-        'ignore' => ['music', 'radio', 'moi merino'],
+        'ignore' => ['music', 'radio', 'moi merino', 'Estación'],
     ]);
 }
 
@@ -28,7 +28,7 @@ it('is case and whitespace insensitive', function () {
 });
 
 it('maps one tag onto several genres when the taxonomy says so', function () {
-    expect(mapper()->map('pop rock'))->toBe(['rock']);
+    expect(mapper()->map('pop rock'))->toBe(['pop', 'rock']);
 });
 
 it('collects genres from every tag in the list', function () {
@@ -64,4 +64,10 @@ it('matches whole tags only, never substrings', function () {
 
 it('maps a multiword accented tag', function () {
     expect(mapper()->map('Regional Mexicana'))->toBe(['latin']);
+});
+
+it('normalises the ignore list, not just the incoming tags', function () {
+    // 'Estación' is registered un-normalised; an incoming 'estacion' must still be ignored.
+    expect(mapper()->map('estacion'))->toBe(['other'])
+        ->and(mapper()->map('ESTACIÓN, pop'))->toBe(['pop']);
 });
