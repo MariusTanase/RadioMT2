@@ -51,13 +51,8 @@
         <li class="shrink-0 list-none">
             <a href="{{ $allHref }}"
                @if ($allActive) aria-current="true" @endif
-               @class([
-                   'text-app-text border-btn-border flex flex-col items-center gap-1 rounded-md border font-sans text-[13px] font-semibold no-underline outline-none transition-colors duration-150 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-icon-hover',
-                   $itemBoxClasses,
-                   'bg-btn-hover shadow-[inset_0_1px_3px_rgb(0_0_0/0.35)]' => $allActive,
-                   'bg-btn hover:bg-btn-hover' => ! $allActive,
-               ])>
-                <span class="flex items-center gap-1.5">
+               class="nc-pill">
+                <span class="flex items-baseline gap-1.5">
                     {{-- Non-colour selection cue: a filled dot, not colour alone (§5.2). --}}
                     @if ($allActive)
                         <span class="bg-app-text inline-block h-[5px] w-[5px] shrink-0 rounded-full" aria-hidden="true"></span>
@@ -82,20 +77,15 @@
             <a href="{{ $href }}"
                aria-label="{{ $label }}, {{ number_format($count) }} {{ $stationWord }}"
                @if ($active) aria-current="true" @endif
-               @class([
-                   'text-app-text border-btn-border flex flex-col items-center gap-1 rounded-md border font-sans no-underline outline-none transition-colors duration-150 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-icon-hover',
-                   $itemBoxClasses,
-                   'bg-btn-hover shadow-[inset_0_1px_3px_rgb(0_0_0/0.35)]' => $active,
-                   'bg-btn hover:bg-btn-hover' => ! $active,
-               ])>
-                <span class="flex items-center gap-1.5 text-[13px] font-semibold" aria-hidden="true">
+               class="nc-pill">
+                <span class="flex items-baseline gap-1.5" aria-hidden="true">
                     {{-- Non-colour selection cue: a filled dot, not colour alone (§5.2). --}}
                     @if ($active)
                         <span class="bg-app-text inline-block h-[5px] w-[5px] shrink-0 rounded-full"></span>
                     @endif
                     {{ $label }}
                 </span>
-                <span class="{{ $countClasses }} text-[11px] font-normal opacity-70 tabular-nums" aria-hidden="true">
+                <span class="nc-pill-count" aria-hidden="true">
                     {{ number_format($count) }}
                 </span>
             </a>

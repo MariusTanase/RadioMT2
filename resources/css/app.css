@@ -437,3 +437,331 @@
         .nc-meter.is-live span { animation: none; transform: scaleY(.55); }
     }
 }
+
+/* ---------------------------------------------------------------------------
+   Controls.
+
+   The tune bar was eight bright bordered boxes in a row, each the same visual
+   weight, plus two raw browser checkboxes and three unstyled native selects.
+   Borders everywhere means the eye has nowhere to rest, and native form chrome
+   is what makes an interface read as a form rather than a product.
+
+   The rule here: controls sit ON the pane, they are not boxes on it. One height
+   (36px), no resting borders, weight earned only by state.
+   --------------------------------------------------------------------------- */
+@layer components {
+    .nc-field {
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding-inline: 12px;
+        border: 0;
+        border-radius: 8px;
+        background: color-mix(in srgb, var(--color-app-text) 6%, transparent);
+        color: var(--color-app-text);
+        font-family: var(--font-sans);
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 1;
+        transition: background-color .16s ease, box-shadow .16s ease;
+    }
+    .nc-field:hover { background: color-mix(in srgb, var(--color-app-text) 11%, transparent); }
+    .nc-field:focus-visible,
+    .nc-field:focus-within {
+        outline: none;
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-icon-hover) 70%, transparent);
+    }
+
+    /* Native selects: strip the platform chrome, supply one quiet chevron. */
+    select.nc-field {
+        appearance: none;
+        -webkit-appearance: none;
+        padding-right: 30px;
+        background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+                          linear-gradient(135deg, currentColor 50%, transparent 50%);
+        background-position: calc(100% - 15px) 50%, calc(100% - 10px) 50%;
+        background-size: 5px 5px, 5px 5px;
+        background-repeat: no-repeat;
+    }
+    select.nc-field option { background: var(--color-app); color: var(--color-app-text); }
+
+    input.nc-field::placeholder { color: color-mix(in srgb, var(--color-app-text) 45%, transparent); font-weight: 400; }
+    input.nc-field::-webkit-search-cancel-button { filter: invert(1); opacity: .5; }
+
+    /* Toggles: the native checkbox is hidden and the label itself becomes the
+       control, so "on" is a filled pill rather than a tick in a white square. */
+    .nc-toggle { cursor: pointer; user-select: none; }
+    .nc-toggle input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+    .nc-toggle::before {
+        content: '';
+        width: 6px; height: 6px;
+        border-radius: 9999px;
+        background: color-mix(in srgb, var(--color-app-text) 28%, transparent);
+        transition: background-color .16s ease, box-shadow .16s ease;
+    }
+    .nc-toggle:has(input:checked) {
+        background: color-mix(in srgb, var(--color-icon-hover) 22%, transparent);
+        color: var(--color-app-text);
+    }
+    .nc-toggle:has(input:checked)::before {
+        background: var(--color-icon-hover);
+        box-shadow: 0 0 10px color-mix(in srgb, var(--color-icon-hover) 80%, transparent);
+    }
+    .nc-toggle:has(input:focus-visible) {
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-icon-hover) 70%, transparent);
+    }
+
+    /* Genre pills: text first, count as a quiet trailing numeral on the SAME
+       line. The previous two-line bordered boxes made ten of them read as ten
+       competing objects. */
+    .nc-pill {
+        height: 32px;
+        display: inline-flex;
+        align-items: baseline;
+        gap: 6px;
+        padding-inline: 12px;
+        border: 0;
+        border-radius: 9999px;
+        background: transparent;
+        color: var(--color-app-text);
+        font-family: var(--font-sans);
+        font-size: 13px;
+        font-weight: 500;
+        white-space: nowrap;
+        opacity: .72;
+        transition: background-color .16s ease, opacity .16s ease;
+    }
+    .nc-pill:hover { background: color-mix(in srgb, var(--color-app-text) 8%, transparent); opacity: 1; }
+    .nc-pill[aria-current='true'] {
+        background: color-mix(in srgb, var(--color-icon-hover) 20%, transparent);
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-icon-hover) 45%, transparent);
+        opacity: 1;
+    }
+    .nc-pill .nc-pill-count {
+        font-size: 11px;
+        font-variant-numeric: tabular-nums;
+        opacity: .55;
+    }
+    .nc-pill:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-icon-hover) 70%, transparent);
+    }
+
+    /* The genre strip scrolls; fade its trailing edge instead of clipping a
+       label mid-word against the pane border. */
+    .nc-strip {
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 40px), transparent 100%);
+        mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 40px), transparent 100%);
+    }
+    .nc-strip::-webkit-scrollbar { display: none; }
+}
+
+/* ===========================================================================
+   2026 VISUAL LAYER — a ground-up replacement.
+
+   Everything above this point descends from a 2020 hobby project: a navy
+   palette built from HSLA scale variables, a full-bleed holiday photograph,
+   and a particle field. This block overrides that lineage wholesale while
+   keeping the same eleven token NAMES, so every partial inherits the new
+   look without being rewritten.
+
+   The palette: near-black ground, a single warm accent, and light used
+   sparingly as elevation rather than colour.
+   =========================================================================== */
+:root,
+[data-theme='blue'],
+[data-theme='dark'],
+[data-theme='crimson'],
+[data-theme='light'] {
+    --color-app:          #07070a;
+    --color-app-text:     #f4f4f6;
+    --color-player:       #ffffff;
+    --color-button:       #f4f4f6;
+
+    /* Surfaces are elevations of the ground, not separate hues. */
+    --color-menu:         #101016;
+    --color-menu-hover:   #17171f;
+    --color-btn:          #14141b;
+    --color-btn-border:   #26262f;
+    --color-btn-hover:    #1d1d26;
+
+    /* One accent. Everything interactive borrows it; nothing else does. */
+    --color-icon-hover:   #ff6a3d;
+    --color-thumb:        #ff6a3d;
+    --color-gear:         #8a8a99;
+}
+
+/* The photograph and the particle field are gone — they were the single
+   biggest source of noise and the reason type needed a scrim to survive. */
+.background {
+    background-image: none !important;
+    background-color: var(--color-app);
+}
+.background::after {
+    background:
+        radial-gradient(90% 55% at 50% -8%, color-mix(in srgb, var(--color-icon-hover) 13%, transparent) 0%, transparent 62%),
+        radial-gradient(70% 45% at 88% 8%, color-mix(in srgb, #4b6cff 9%, transparent) 0%, transparent 60%);
+}
+#tsparticles { display: none; }
+
+@layer components {
+    /* The pane becomes a quiet elevation, not a glass slab over a photo. */
+    .nc-pane {
+        background: color-mix(in srgb, var(--color-menu) 82%, transparent);
+        backdrop-filter: blur(24px) saturate(120%);
+        -webkit-backdrop-filter: blur(24px) saturate(120%);
+        border: 1px solid #1c1c24;
+        border-radius: 20px;
+        box-shadow:
+            0 1px 0 rgb(255 255 255 / .04) inset,
+            0 40px 90px -40px #000;
+    }
+
+    /* Type: real hierarchy. The station name is the object; everything else
+       is annotation, set small, wide-tracked and dim. */
+    .nc-row-title {
+        font-family: var(--font-sans);
+        font-size: 15px;
+        line-height: 20px;
+        font-weight: 550;
+        letter-spacing: -0.01em;
+        opacity: .92;
+    }
+    .nc-row:hover .nc-row-title { opacity: 1; }
+    .nc-row-caption {
+        font-family: var(--font-sans);
+        font-size: 10.5px;
+        line-height: 14px;
+        font-weight: 500;
+        letter-spacing: .10em;
+        text-transform: uppercase;
+        opacity: .40;
+    }
+    .nc-row-folio {
+        font-family: var(--font-sans);
+        font-size: 11px;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: .04em;
+        opacity: .26;
+    }
+    .nc-row {
+        border-bottom: 1px solid #16161d !important;
+        transition: background-color .14s ease;
+    }
+    .nc-row:hover { background: #121219; }
+    .nc-row[aria-current='true'] { background: color-mix(in srgb, var(--color-icon-hover) 9%, transparent); }
+
+    .nc-count-line {
+        font-family: var(--font-sans);
+        font-size: 10.5px;
+        font-weight: 500;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        opacity: .38;
+    }
+
+    /* The dock: a true black plate, one accent control, nothing else loud. */
+    #dock {
+        background: #0a0a0e !important;
+        background-image: none !important;
+        border-top: 1px solid #1c1c24 !important;
+        box-shadow: 0 -30px 60px -30px #000 !important;
+    }
+    .nc-dock-name  { font-size: 14px; font-weight: 550; letter-spacing: -0.01em; }
+    .nc-dock-title { font-size: 12px; opacity: .55; }
+    .nc-dock-status{ font-size: 10.5px; letter-spacing: .10em; text-transform: uppercase; opacity: .45; }
+
+    .nc-play {
+        background: var(--color-icon-hover);
+        color: #0a0a0e;
+        box-shadow: 0 8px 24px -8px color-mix(in srgb, var(--color-icon-hover) 85%, transparent);
+    }
+    .nc-play:hover { background: #ff7d55; }
+
+    .nc-meter span { background: var(--color-icon-hover); }
+
+    /* Volume reads as a track, not a hairline. */
+    .volume-slider {
+        height: 3px !important;
+        border-radius: 999px;
+        background: #26262f !important;
+        opacity: 1 !important;
+    }
+    .volume-slider::-webkit-slider-thumb {
+        width: 11px; height: 11px;
+        background: var(--color-app-text);
+        border: none;
+    }
+    .volume-slider::-moz-range-thumb {
+        width: 11px; height: 11px;
+        background: var(--color-app-text);
+        border: none;
+    }
+}
+
+/* ---------------------------------------------------------------------------
+   Phones.
+
+   Three things make a desktop-first layout feel clunky on a phone: surfaces
+   that keep their desktop margins and corners so content is squeezed into a
+   narrow gutter, tap targets sized for a cursor, and a fixed bar that sits
+   under the iOS home indicator. All three are addressed here.
+   --------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+    :root { --dock-h: 76px; }
+
+    /* Full-bleed: on a 390px screen, 16px of side margin plus a 20px radius
+       costs a tenth of the width and buys nothing. */
+    .nc-pane {
+        margin-top: 0;
+        border-inline: 0;
+        border-top: 0;
+        border-radius: 0;
+        box-shadow: none;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;   /* blur is expensive on mobile GPUs */
+        background: color-mix(in srgb, var(--color-menu) 94%, transparent);
+    }
+
+    /* Touch targets. 48px is the floor; the whole row is the target, never a
+       small glyph inside it. */
+    .nc-row { min-height: 56px; }
+    .nc-field { height: 40px; font-size: 14px; }     /* 16px input avoids iOS zoom — see below */
+    .nc-pill { height: 36px; padding-inline: 14px; font-size: 13px; }
+
+    /* iOS zooms the page when a focused input is under 16px. */
+    input.nc-field,
+    select.nc-field { font-size: 16px; }
+
+    /* Type: bump the object, keep the annotation quiet. */
+    .nc-row-title   { font-size: 15.5px; line-height: 21px; }
+    .nc-row-caption { font-size: 10px; letter-spacing: .08em; }
+    .nc-count-line  { font-size: 10px; }
+
+    /* The dock clears the home indicator instead of sitting under it. */
+    #dock {
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        height: calc(var(--dock-h) + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* Momentum scrolling on the genre strip, and enough end padding that the
+       last pill is reachable rather than pinned under the fade. */
+    .nc-strip {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+        scroll-snap-type: x proximity;
+        padding-inline-end: 44px;
+    }
+    .nc-strip .nc-pill { scroll-snap-align: center; }
+
+    /* Hover states never fire on touch; make sure nothing depends on them. */
+    .nc-row:hover { background: transparent; }
+    .nc-row:active { background: #15151d; }
+}
+
+/* Nothing may cause a sideways scroll on a phone. */
+html, body { max-width: 100%; overflow-x: hidden; }

@@ -86,12 +86,8 @@
         @endif
 
         {{-- Favourites toggle — at the left of the bar (§6.3). Just another param. --}}
-        <label @class([
-            'border-btn-border font-sans inline-flex h-10 shrink-0 cursor-pointer items-center gap-2 rounded-md border px-3 text-[13px] font-medium select-none',
-            'bg-btn-hover' => $filter->fav,
-            'bg-btn hover:bg-btn-hover' => ! $filter->fav,
-        ])>
-            <input type="checkbox" name="fav" value="1" class="h-3.5 w-3.5"
+        <label class="nc-field nc-toggle shrink-0">
+            <input type="checkbox" name="fav" value="1"
                    @checked($filter->fav)
                    x-on:change="$el.form.requestSubmit()">
             Favourites
@@ -102,7 +98,7 @@
             <label for="tune-search" class="sr-only">Find a station</label>
             <input type="search" id="tune-search" name="q" value="{{ $filter->q }}"
                    placeholder="Find a station"
-                   class="border-btn-border bg-btn text-app-text placeholder:text-app-text font-sans h-10 w-full rounded-md border px-3 text-sm placeholder:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-icon-hover"
+                   class="nc-field"
                    x-on:input.debounce.350ms="$el.value.length === 0 || $el.value.length >= 2 ? $el.form.requestSubmit() : null">
         </div>
 
@@ -134,7 +130,7 @@
             <div class="min-w-[160px]">
                 <label for="tune-country" class="sr-only">Country</label>
                 <select id="tune-country" name="{{ $countrySelectName }}"
-                        class="border-btn-border bg-btn text-app-text font-sans h-10 w-full rounded-md border px-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-icon-hover max-[720px]:w-full"
+                        class="nc-field"
                         x-on:change="$el.name = $el.selectedOptions[0].dataset.kind === 'region' ? 'region' : 'country'; $el.form.requestSubmit()">
                     <option value="" data-kind="none">All countries</option>
                     @foreach ($continentGroups as $continent => $countries)
@@ -157,7 +153,7 @@
             <div class="min-w-[160px]">
                 <label for="tune-language" class="sr-only">Language</label>
                 <select id="tune-language" name="language"
-                        class="border-btn-border bg-btn text-app-text font-sans h-10 w-full rounded-md border px-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-icon-hover max-[720px]:w-full"
+                        class="nc-field"
                         x-on:change="$el.form.requestSubmit()">
                     <option value="">All languages</option>
                     @foreach ($languageOptions as $option)
@@ -171,7 +167,7 @@
             <div class="min-w-[160px]">
                 <label for="tune-sort" class="sr-only">Sort</label>
                 <select id="tune-sort" name="sort"
-                        class="border-btn-border bg-btn text-app-text font-sans h-10 w-full rounded-md border px-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-icon-hover max-[720px]:w-full"
+                        class="nc-field"
                         x-on:change="$el.form.requestSubmit()">
                     @foreach ($sortOptions as $value => $label)
                         <option value="{{ $value }}" @selected($filter->sort === $value)>{{ $label }}</option>
@@ -181,12 +177,8 @@
 
             {{-- On air only — defaults ON; turning it off is an explicit opt-in (§6.3). --}}
             <input type="hidden" name="alive" value="0">
-            <label @class([
-                'border-btn-border font-sans inline-flex h-10 shrink-0 cursor-pointer items-center gap-2 rounded-md border px-3 text-[13px] font-medium select-none',
-                'bg-btn-hover' => $filter->alive,
-                'bg-btn hover:bg-btn-hover' => ! $filter->alive,
-            ])>
-                <input type="checkbox" name="alive" value="1" class="h-3.5 w-3.5"
+            <label class="nc-field nc-toggle shrink-0">
+                <input type="checkbox" name="alive" value="1"
                        @checked($filter->alive)
                        x-on:change="$el.form.requestSubmit()">
                 On air only
@@ -194,7 +186,7 @@
         </div>
 
         <noscript>
-            <button type="submit" class="border-btn-border bg-btn hover:bg-btn-hover text-app-text font-sans h-10 shrink-0 rounded-md border px-4 text-[13px] font-semibold">
+            <button type="submit" class="nc-field">
                 Apply
             </button>
         </noscript>
@@ -204,7 +196,7 @@
                 x-on:click="filtersOpen = true"
                 aria-haspopup="true"
                 x-bind:aria-expanded="filtersOpen.toString()"
-                class="border-btn-border bg-btn hover:bg-btn-hover text-app-text font-sans hidden h-10 shrink-0 items-center justify-center rounded-md border px-4 text-[13px] font-semibold outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-icon-hover max-[720px]:inline-flex">
+                class="nc-field">
             Filters
         </button>
     </form>
