@@ -43,7 +43,7 @@ it('ignores an unknown sort and falls back to played', function () {
 });
 
 it('accepts every documented sort', function () {
-    foreach (['played', 'voted', 'bitrate', 'az'] as $sort) {
+    foreach (['played', 'voted', 'bitrate', 'az', 'country'] as $sort) {
         expect(filterFor(['sort' => $sort])->sort)->toBe($sort);
     }
 });
@@ -96,4 +96,88 @@ it('reports whether any non-default filter is active', function () {
         ->and(filterFor(['q' => 'fm'])->isActive())->toBeTrue()
         ->and(filterFor(['genre' => 'pop'])->isActive())->toBeTrue()
         ->and(filterFor(['sort' => 'az'])->isActive())->toBeTrue();
+});
+
+it('builds via fromRequest identically to the constructor', function () {
+    $request = Request::create('/', 'GET', ['q' => 'fm']);
+
+    expect(CatalogueFilter::fromRequest($request)->q)->toBe('fm');
+});
+
+it('defaults alive to true and fav to false', function () {
+    $filter = filterFor([]);
+
+    expect($filter->alive)->toBeTrue()
+        ->and($filter->fav)->toBeFalse();
+});
+
+it('turns alive off only for an explicit 0', function () {
+    expect(filterFor(['alive' => '0'])->alive)->toBeFalse()
+        ->and(filterFor(['alive' => '1'])->alive)->toBeTrue()
+        ->and(filterFor(['alive' => 'bogus'])->alive)->toBeTrue();
+});
+
+it('turns fav on for a truthy value', function () {
+    expect(filterFor(['fav' => '1'])->fav)->toBeTrue()
+        ->and(filterFor([])->fav)->toBeFalse();
+});
+
+it('keeps a two-letter country code, uppercased', function () {
+    expect(filterFor(['country' => 'de'])->country)->toBe('DE');
+});
+
+it('ignores a malformed country code', function () {
+    expect(filterFor(['country' => 'zzz'])->country)->toBeNull()
+        ->and(filterFor(['country' => '1'])->country)->toBeNull();
+});
+
+it('keeps a known continent as region', function () {
+    expect(filterFor(['region' => 'europe'])->region)->toBe('europe');
+});
+
+it('ignores an unknown region', function () {
+    expect(filterFor(['region' => 'narnia'])->region)->toBeNull();
+});
+
+it('lets country win when country and region both arrive', function () {
+    $filter = filterFor(['country' => 'de', 'region' => 'asia']);
+
+    expect($filter->country)->toBe('DE')
+        ->and($filter->region)->toBeNull();
+});
+
+it('trims language and ignores an empty one', function () {
+    expect(filterFor(['language' => '  english  '])->language)->toBe('english')
+        ->and(filterFor(['language' => '   '])->language)->toBeNull();
+});
+
+it('exposes removable filter chips with a url that drops just that param', function () {
+    $filter = filterFor(['q' => 'fm', 'genre' => 'jazz']);
+
+    $tokens = collect($filter->tokens())->keyBy('key');
+
+    expect($tokens->has('q'))->toBeTrue()
+        ->and($tokens->has('genre'))->toBeTrue()
+        ->and($tokens['genre']['label'])->toBe('Jazz')
+        ->and($tokens['q']['url'])->not->toContain('q=fm')
+        ->and($tokens['q']['url'])->toContain('genre=jazz')
+        ->and($tokens['genre']['url'])->not->toContain('genre=jazz')
+        ->and($tokens['genre']['url'])->toContain('q=fm');
+});
+
+it('produces no chips when no filter is active', function () {
+    expect(filterFor([])->tokens())->toBe([]);
+});
+
+it('builds a minimal canonical query string, omitting defaults', function () {
+    expect(filterFor([])->toQueryString())->toBe('')
+        ->and(filterFor(['sort' => 'az'])->toQueryString())->toBe('sort=az')
+        ->and(filterFor(['page' => '3'])->toQueryString())->toBe('page=3');
+});
+
+it('lets overrides replace or remove params in the query string', function () {
+    $filter = filterFor(['genre' => 'jazz', 'page' => '2']);
+
+    expect($filter->toQueryString(['page' => 5]))->toBe('genre=jazz&page=5')
+        ->and($filter->toQueryString(['page' => null]))->toBe('genre=jazz');
 });

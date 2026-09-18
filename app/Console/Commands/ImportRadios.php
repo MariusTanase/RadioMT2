@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Genre;
 use App\Models\Radio;
+use App\Support\CatalogueCounts;
 use App\Support\GenreMapper;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
@@ -74,6 +75,10 @@ class ImportRadios extends Command
         }
 
         $this->info("Done. Imported {$imported} station(s).");
+
+        // A fresh import must never leave the genre/country/language bands
+        // serving stale counts from before it ran.
+        CatalogueCounts::flush();
 
         return self::SUCCESS;
     }
