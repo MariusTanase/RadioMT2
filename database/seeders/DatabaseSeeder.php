@@ -14,6 +14,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(RadioSeeder::class);
+        $this->call([
+            GenreSeeder::class,
+            RadioSeeder::class,
+        ]);
     }
 }
