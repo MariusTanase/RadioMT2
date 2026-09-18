@@ -1,10 +1,12 @@
 import Alpine from 'alpinejs';
+import catalogue from './radio/catalogue';
 import radioPlayer from './radio/player';
 import radioSettings from './radio/settings';
 import { initParticles } from './radio/particles';
 
 window.Alpine = Alpine;
 
+Alpine.data('catalogue', catalogue);
 Alpine.data('radioPlayer', radioPlayer);
 Alpine.data('radioSettings', radioSettings);
 

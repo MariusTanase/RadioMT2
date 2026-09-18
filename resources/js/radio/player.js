@@ -14,6 +14,33 @@ export default function radioPlayer() {
             return this.$refs.audio;
         },
 
+        // Filtering or paging swaps #catalogue without reloading the document, so
+        // the player must adopt the new page's stations while whatever is playing
+        // keeps playing — even when that station is no longer in the result set.
+        adoptPage(stations) {
+            if (!Array.isArray(stations)) {
+                return;
+            }
+
+            const playing = this.current;
+
+            this.stations = stations;
+
+            if (!playing) {
+                this.index = 0;
+
+                return;
+            }
+
+            const stillListed = stations.findIndex((s) => s.id === playing.id);
+
+            // Not on this page any more: keep it at the end so `current` still
+            // resolves to it and the audio element is never re-pointed.
+            this.index = stillListed === -1
+                ? this.stations.push(playing) - 1
+                : stillListed;
+        },
+
         boot() {
             if (this.stations.length === 0) {
                 return;
@@ -24,6 +51,10 @@ export default function radioPlayer() {
             this.index = Math.floor(Math.random() * this.stations.length);
             this.setVolume(this.volume);
             this.$nextTick(() => this.play());
+
+            window.addEventListener('catalogue:swapped', (event) => {
+                this.adoptPage(event.detail?.stations);
+            });
         },
 
         // Space toggles playback, but only when focus isn't inside a form
