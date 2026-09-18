@@ -8,23 +8,23 @@ use Database\Seeders\RadioSeeder;
 beforeEach(fn () => $this->seed(GenreSeeder::class));
 
 it('shows only one page of stations at a time', function () {
-    Radio::factory()->count(45)->create();
+    Radio::factory()->count(120)->create();
 
-    expect($this->get('/')->viewData('radios'))->toHaveCount(20);
+    expect($this->get('/')->viewData('radios'))->toHaveCount(50);
 });
 
 it('paginates to a second page without repeating a station', function () {
-    Radio::factory()->count(45)->create();
+    Radio::factory()->count(120)->create();
 
     $first = $this->get('/')->viewData('radios')->pluck('id');
     $second = $this->get('/?page=2')->viewData('radios')->pluck('id');
 
     expect($first->intersect($second))->toBeEmpty()
-        ->and($second)->toHaveCount(20);
+        ->and($second)->toHaveCount(50);
 });
 
 it('renders pagination controls when there is more than one page', function () {
-    Radio::factory()->count(45)->create();
+    Radio::factory()->count(120)->create();
 
     $this->get('/')->assertSee('Page 1 of', escape: false);
 });
