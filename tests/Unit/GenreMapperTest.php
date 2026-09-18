@@ -71,3 +71,52 @@ it('normalises the ignore list, not just the incoming tags', function () {
     expect(mapper()->map('estacion'))->toBe(['other'])
         ->and(mapper()->map('ESTACIÓN, pop'))->toBe(['pop']);
 });
+
+// --- deep house -----------------------------------------------------------
+
+function deepHouseMapper(): GenreMapper
+{
+    return new GenreMapper([
+        'genres' => [
+            'house' => ['label' => 'House', 'sort' => 80, 'specificity' => 4, 'tags' => ['house', 'deep house', 'deephouse', 'deep-house', 'tech house']],
+            'deep-house' => ['label' => 'Deep House', 'sort' => 85, 'specificity' => 9, 'tags' => ['deep house', 'deephouse', 'deep-house']],
+            'lofi' => ['label' => 'Lofi & Chill', 'sort' => 240, 'specificity' => 5, 'tags' => ['chillout', 'chill']],
+            'other' => ['label' => 'Other', 'sort' => 999, 'specificity' => 0, 'tags' => []],
+        ],
+        'ignore' => [],
+    ]);
+}
+
+it('maps every deep house tag variant onto both deep-house and house', function (string $tag) {
+    expect(deepHouseMapper()->map($tag))->toEqualCanonicalizing(['deep-house', 'house']);
+})->with(['deep house', 'deephouse', 'deep-house']);
+
+it('keeps plain house out of deep-house', function () {
+    expect(deepHouseMapper()->map('house'))->toBe(['house']);
+});
+
+// --- primary() --------------------------------------------------------------
+
+it('picks the most specific genre as primary, not the first matched', function () {
+    $mapper = deepHouseMapper();
+
+    expect($mapper->primary(['house', 'deep-house']))->toBe('deep-house')
+        ->and($mapper->primary(['deep-house', 'house']))->toBe('deep-house');
+});
+
+it('breaks specificity ties on declaration order', function () {
+    $mapper = new GenreMapper([
+        'genres' => [
+            'a' => ['label' => 'A', 'sort' => 1, 'specificity' => 5, 'tags' => []],
+            'b' => ['label' => 'B', 'sort' => 2, 'specificity' => 5, 'tags' => []],
+            'other' => ['label' => 'Other', 'sort' => 999, 'specificity' => 0, 'tags' => []],
+        ],
+        'ignore' => [],
+    ]);
+
+    expect($mapper->primary(['b', 'a']))->toBe('a');
+});
+
+it('falls back to other when given an empty slug list', function () {
+    expect(mapper()->primary([]))->toBe('other');
+});

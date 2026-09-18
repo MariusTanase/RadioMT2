@@ -12,7 +12,13 @@ class GenreMapper
     /** @var array<string, true> normalised tag => ignored */
     private array $ignore = [];
 
-    /** @param array{genres: array<string, array{label: string, sort: int, tags: list<string>}>, ignore: list<string>}|null $config */
+    /** @var array<string, int> genre slug => specificity, higher wins in primary() */
+    private array $specificity = [];
+
+    /** @var array<string, int> genre slug => declaration order, lower wins primary() ties */
+    private array $declarationOrder = [];
+
+    /** @param array{genres: array<string, array{label: string, sort: int, specificity?: int, tags: list<string>}>, ignore: list<string>}|null $config */
     public function __construct(?array $config = null)
     {
         $config ??= config('radio-genres');
@@ -21,7 +27,12 @@ class GenreMapper
             $this->ignore[$this->normalise($tag)] = true;
         }
 
+        $order = 0;
+
         foreach ($config['genres'] as $slug => $genre) {
+            $this->specificity[$slug] = $genre['specificity'] ?? 0;
+            $this->declarationOrder[$slug] = $order++;
+
             foreach ($genre['tags'] as $tag) {
                 $this->index[$this->normalise($tag)][] = $slug;
             }
@@ -50,6 +61,35 @@ class GenreMapper
         }
 
         return $slugs === [] ? ['other'] : array_keys($slugs);
+    }
+
+    /**
+     * Pick the single most specific genre out of a set of matched slugs, for
+     * use as the one display label a station shows. Ties (equal
+     * specificity) break on declaration order in config/radio-genres.php, so
+     * the result never depends on the order tags happened to appear in the
+     * source data.
+     *
+     * @param  list<string>  $slugs  as returned by map(); must not be empty
+     */
+    public function primary(array $slugs): string
+    {
+        $best = null;
+        $bestSpecificity = -1;
+        $bestOrder = PHP_INT_MAX;
+
+        foreach ($slugs as $slug) {
+            $specificity = $this->specificity[$slug] ?? 0;
+            $order = $this->declarationOrder[$slug] ?? PHP_INT_MAX;
+
+            if ($specificity > $bestSpecificity || ($specificity === $bestSpecificity && $order < $bestOrder)) {
+                $best = $slug;
+                $bestSpecificity = $specificity;
+                $bestOrder = $order;
+            }
+        }
+
+        return $best ?? 'other';
     }
 
     /**
