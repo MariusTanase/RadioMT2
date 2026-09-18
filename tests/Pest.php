@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 /*
@@ -47,4 +48,70 @@ expect()->extend('toBeOne', function () {
 function something()
 {
     // ..
+}
+
+/*
+|--------------------------------------------------------------------------
+| Radio Browser import fixtures
+|--------------------------------------------------------------------------
+|
+| Shared by tests/Feature/RadioImport*.php. They live here — rather than in
+| one of those test files — because Pest loads every test file as it runs
+| it, so a function declared inside one test file is only safely visible to
+| files that execute after it; tests/Pest.php is loaded once, up front, so
+| these are available to every test regardless of run order.
+|
+*/
+
+/** @return array<string, mixed> a single Radio Browser API station record */
+function station(array $overrides = []): array
+{
+    return array_merge([
+        'stationuuid' => 'uuid-1',
+        'name' => 'Test FM',
+        'url' => 'https://example.test/stream',
+        'url_resolved' => 'https://example.test/resolved',
+        'homepage' => 'https://example.test',
+        'favicon' => 'https://example.test/icon.png',
+        'tags' => 'pop,rock',
+        'country' => 'Germany',
+        'countrycode' => 'DE',
+        'language' => 'german',
+        'codec' => 'MP3',
+        'bitrate' => 128,
+        'votes' => 42,
+        'clickcount' => 99,
+        'lastcheckok' => 1,
+        'lastchecktime_iso8601' => '2026-09-16T13:32:14Z',
+    ], $overrides);
+}
+
+/** @return list<array<string, mixed>> $count stations numbered from $from */
+function page(int $from, int $count): array
+{
+    return collect(range($from, $from + $count - 1))
+        ->map(fn ($i) => station(['stationuuid' => "uuid-$i", 'name' => "Station $i"]))
+        ->all();
+}
+
+/**
+ * Fake the Radio Browser endpoint with one response per page, in order.
+ *
+ * Pushes exactly one response per array given, then falls back to an empty
+ * page for any further request. The `whenEmpty()` fallback matters because
+ * several import tests run `radios:import` twice against the same fake: a
+ * plain `pushResponse(...$pages)` splat (as an earlier draft of this helper
+ * did) silently drops every page but the first, since `pushResponse()`
+ * takes exactly one argument — and a bare `ResponseSequence` throws
+ * `OutOfBoundsException` once its queue is exhausted, rather than idling.
+ */
+function fakePages(array ...$pages): void
+{
+    $sequence = Http::sequence();
+
+    foreach ($pages as $page) {
+        $sequence->push($page);
+    }
+
+    Http::fake(['*radio-browser.info*' => $sequence->whenEmpty(Http::response([]))]);
 }
