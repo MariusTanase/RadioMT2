@@ -1,17 +1,29 @@
 {{--
-    The manifest: a numbered, hairline-ruled, single-column list of stations
-    (see docs/superpowers/specs/2026-09-18-radio-page-design-direction.md §4.5).
+    The manifest: The Night Console's ledger of stations (design direction
+    docs/superpowers/specs/2026-09-18-posh-redesign-direction.md §7.1). This
+    is an evolution of the old seven-column ledger, not a reinvention: seven
+    columns become two lines (title + one dim caption), bordered metadata
+    chips are gone entirely, the hover-only affordance becomes an
+    always-visible glyph, and a rank folio replaces the page-local index.
+
+    Type, opacity and the bevel/ember mechanics come from the shared "Night
+    Console" CSS foundation in resources/css/app.css (.nc-row, .nc-row-folio,
+    .nc-row-title, .nc-row-caption, .nc-bevel, .nc-ember) rather than being
+    hand-rolled here, so every surface on the page shares one vocabulary.
 
     No artwork per row — the design deliberately drops it (missing/broken for
-    most of the catalogue) — which removes the row-height alignment problem,
-    but titles still run to 255 characters (54 on page one alone), so the
-    title cell is a single line, `truncate`d, with the full name in `title=`
-    for anyone who needs it.
+    37%+ of the catalogue) — but titles still run to 255 characters, so the
+    title is a single line, `truncate`d, with the full name in `title=` for
+    anyone who needs it.
 
-    `listeners` is NULL for the overwhelming majority of stations (only
-    Icecast servers with a public status endpoint report one). Absence is the
-    normal case: the "live" column renders nothing at all when it is null,
-    never "0 listeners", and nothing here sorts by it.
+    Selection/playing state is shown by SHAPE — the 3px left edge, the
+    breathing ember dot replacing the rocker glyph, `aria-current` — never by
+    colour fill alone, so it survives all four themes.
+
+    `listeners` and `votes` are NULL for the overwhelming majority of
+    stations. They leave the resting row entirely (§7.1: "survive only in
+    the row's title= tooltip") — rendered as nothing when both are null,
+    never "0 votes" / "0 listeners", and nothing here sorts by them.
 --}}
 @php
     // A row is tagged with one genre label, but stations are multi-genre —
@@ -27,17 +39,16 @@
 @endphp
 
 <style>
-    /* Pure-CSS "playing" glyph — no Web Audio analyser, no JS loop (§6, C6).
-       Reduced motion collapses it to the single static bar §10.3 specifies. */
-    .rmt-eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 14px; }
-    .rmt-eq span { display: block; width: 2px; background: currentColor; border-radius: 1px; animation: rmt-eq-bounce 900ms ease-in-out infinite; }
-    .rmt-eq span:nth-child(2) { animation-delay: 200ms; }
-    .rmt-eq span:nth-child(3) { animation-delay: 400ms; }
-    @keyframes rmt-eq-bounce { 0%, 100% { height: 4px; } 50% { height: 14px; } }
-    @media (prefers-reduced-motion: reduce) {
-        .rmt-eq span { animation: none; height: 8px; }
-        .rmt-eq span:nth-child(2), .rmt-eq span:nth-child(3) { display: none; }
-    }
+    /* The rocker glyph's own rest/hover opacity isn't among the shared
+       foundation's provided classes (resources/css/app.css) — this single
+       rule fills that one gap, modeled on that file's own .nc-row-title
+       hover/focus/current lift, so it stays consistent with the same
+       three-tier law rather than inventing a fourth. */
+    .nc-row-glyph { opacity: .48; transition: opacity 120ms ease-out; }
+    .nc-row:hover .nc-row-glyph,
+    .nc-row:focus-visible .nc-row-glyph,
+    .nc-row.is-active .nc-row-glyph,
+    .nc-row[aria-current='true'] .nc-row-glyph { opacity: 1; }
 </style>
 
 <ul class="m-0 list-none p-0" role="list" aria-label="Stations">
@@ -49,52 +60,56 @@
                 $radio->bitrate ? $radio->bitrate.'k' : null,
                 $radio->codec,
             ])->filter()->implode(' · ');
+
+            // Cell 3's caption — Genre · Country · 128k · MP3 — with each
+            // field omitted (never dashed, never "0") when absent, identical
+            // at every width (§7.1).
+            $caption = collect([$genreCaption, $radio->country_code, $stream])->filter()->implode(' · ');
+
+            // Votes and listener counts are sparse and mostly null, so they
+            // leave the resting row and survive only as a tooltip (§7.1).
+            $metaTooltip = collect([
+                ! is_null($radio->votes) ? number_format($radio->votes).' votes' : null,
+                ! is_null($radio->listeners) ? number_format($radio->listeners).' listeners' : null,
+            ])->filter()->implode(' · ');
         @endphp
         <li>
             <button type="button"
-                    class="group grid h-12 w-full cursor-pointer items-center gap-3 border-b border-l-[3px] border-l-transparent px-3 text-left transition-colors duration-150 ease-out hover:bg-menu-hover focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-icon-hover max-[640px]:h-auto max-[640px]:min-h-14 max-[640px]:grid-cols-[56px_minmax(0,1fr)] max-[640px]:py-2 [grid-template-columns:64px_minmax(0,1fr)_120px_56px_104px_72px_88px] [border-bottom-color:color-mix(in_srgb,var(--color-app-text)_12%,transparent)]"
-                    x-bind:class="current?.id === {{ $radio->id }} && isPlaying ? 'border-l-btn-border' : 'border-l-transparent'"
+                    class="nc-row group grid min-h-12 w-full cursor-pointer grid-cols-[28px_56px_minmax(0,1fr)] items-center gap-3 border-b border-l-[3px] border-l-transparent px-3 text-left transition-[background-color] duration-[120ms] ease-out hover:bg-[color:color-mix(in_srgb,var(--color-btn-border)_6%,transparent)] focus-visible:bg-[color:color-mix(in_srgb,var(--color-btn-border)_6%,transparent)] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-icon-hover max-[640px]:min-h-16 [border-bottom-color:color-mix(in_srgb,var(--color-app-text)_10%,transparent)]"
+                    x-bind:class="current?.id === {{ $radio->id }} && isPlaying ? 'is-active border-l-btn-border' : 'border-l-transparent'"
                     x-bind:aria-current="current?.id === {{ $radio->id }} && isPlaying ? 'true' : false"
                     aria-label="Play {{ $radio->title }}"
                     title="{{ $radio->title }}"
                     @click="select({{ $radio->id }})">
 
-                {{-- Index: rank in the tuned set, or the equalizer glyph while this row plays. --}}
-                <span class="justify-self-end text-right text-[13px] font-medium tabular-nums" style="min-width: 5ch">
-                    <span x-show="!(current?.id === {{ $radio->id }} && isPlaying)">{{ number_format($rank) }}</span>
-                    <span class="rmt-eq text-app-text justify-self-end" x-show="current?.id === {{ $radio->id }} && isPlaying" aria-hidden="true">
-                        <span></span><span></span><span></span>
+                {{-- Cell 1 (28px): the play indicator — bevelled rocker at rest,
+                     breathing ember dot while this row is playing. --}}
+                <span class="justify-self-start" aria-hidden="true">
+                    <span class="nc-row-glyph nc-bevel bg-btn border-btn-border inline-flex h-5 w-5 items-center justify-center rounded-[4px] border"
+                          x-show="!(current?.id === {{ $radio->id }} && isPlaying)">
+                        <span class="block h-0 w-0 border-y-[4px] border-l-[6px] border-y-transparent" style="border-left-color: var(--color-app-text)"></span>
                     </span>
+                    <span class="nc-ember h-[9px] w-[9px]" x-show="current?.id === {{ $radio->id }} && isPlaying"></span>
                 </span>
 
-                {{-- Title (+ genre · country secondary line below 640px). --}}
+                {{-- Cell 2 (56px): rank folio — position in the whole filtered,
+                     sorted set, a house number rather than a scoreboard. --}}
+                <span class="nc-row-folio justify-self-end">
+                    {{ number_format($rank) }}
+                </span>
+
+                {{-- Cell 3: title + one dim caption, identical at every width. --}}
                 <div class="flex min-w-0 flex-col justify-center gap-0.5">
-                    <span class="font-opensans truncate text-[15px] font-semibold">{{ $radio->title }}</span>
-                    @if ($genreCaption || $radio->country_code)
-                        <span class="font-opensans hidden truncate text-[12px] opacity-65 max-[640px]:block">
-                            {{ $genreCaption }}{{ $genreCaption && $radio->country_code ? ' · ' : '' }}{{ $radio->country_code }}
+                    <span class="nc-row-title truncate">
+                        {{ $radio->title }}
+                    </span>
+                    @if ($caption !== '')
+                        <span class="nc-row-caption truncate"
+                              @if ($metaTooltip !== '') title="{{ $metaTooltip }}" @endif>
+                            {{ $caption }}
                         </span>
                     @endif
                 </div>
-
-                {{-- Genre, country, stream, votes, live: desktop-only columns (§4.6 drops them below 640px). --}}
-                <span class="font-opensans truncate text-[12px] opacity-65 max-[640px]:hidden">{{ $genreCaption }}</span>
-
-                <span class="text-[13px] font-medium tracking-[0.04em] max-[640px]:hidden">{{ $radio->country_code }}</span>
-
-                <span class="text-[13px] font-medium tabular-nums max-[640px]:hidden">{{ $stream }}</span>
-
-                <span class="justify-self-end text-right text-[13px] font-medium tabular-nums max-[640px]:hidden">
-                    @if (! is_null($radio->votes))
-                        {{ number_format($radio->votes) }}
-                    @endif
-                </span>
-
-                <span class="justify-self-end text-right text-[12px] font-medium tabular-nums max-[640px]:hidden">
-                    @if (! is_null($radio->listeners))
-                        <span aria-hidden="true">●</span> {{ number_format($radio->listeners) }}
-                    @endif
-                </span>
             </button>
         </li>
     @endforeach

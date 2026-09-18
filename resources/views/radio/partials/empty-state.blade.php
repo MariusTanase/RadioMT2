@@ -51,8 +51,15 @@
     }
 @endphp
 
+{{--
+    Type/colour come from the shared "Night Console" CSS foundation
+    (resources/css/app.css): .nc-empty-title, .nc-empty-body, and .nc-bevel
+    on every action button — the one kind of "boxed" surface the design
+    keeps (§4, §7.1). It never appears as a per-row metadata chip, only on
+    controls.
+--}}
 <div class="flex h-[240px] flex-col items-center justify-center gap-4 text-center" aria-live="polite">
-    <p class="text-app-text font-sans text-[20px] font-normal">Nothing here.</p>
+    <p class="nc-empty-title text-app-text">Nothing here.</p>
 
     {{--
         With two or more active filters, restate the scope so the empty
@@ -61,11 +68,11 @@
         favour of the plain sentence (mirrors the button-count rule below).
     --}}
     @if ($tokens->count() > 1)
-        <p class="font-opensans text-app-text max-w-[520px] text-[14px] leading-normal opacity-80">
+        <p class="nc-empty-body text-app-text max-w-[520px]">
             No {{ $filter->alive ? 'on-air ' : '' }}stations match {{ implode(' · ', $scopeParts) }}.
         </p>
     @else
-        <p class="font-opensans text-app-text max-w-[520px] text-[14px] leading-normal opacity-80">
+        <p class="nc-empty-body text-app-text max-w-[520px]">
             No stations match your filters.
         </p>
     @endif
@@ -73,12 +80,12 @@
     <div class="flex flex-wrap items-center justify-center gap-2">
         @if (count($constraints) > 1)
             @foreach ($constraints as $constraint)
-                <a class="border-btn-border bg-btn text-app-text hover:bg-btn-hover font-opensans rounded border px-3 py-2 text-[13px] font-semibold transition-colors duration-150"
+                <a class="nc-bevel border-btn-border bg-btn text-app-text hover:bg-btn-hover font-sans rounded-[4px] border px-3 py-2 text-[13px] font-semibold"
                    href="{{ $constraint['url'] }}">{{ $constraint['label'] }}</a>
             @endforeach
         @endif
 
-        <a class="border-btn-border bg-btn text-app-text hover:bg-btn-hover font-opensans rounded border px-3 py-2 text-[13px] font-semibold transition-colors duration-150"
+        <a class="nc-bevel border-btn-border bg-btn text-app-text hover:bg-btn-hover font-sans rounded-[4px] border px-3 py-2 text-[13px] font-semibold"
            href="{{ route('radio.index') }}">Clear all</a>
     </div>
 </div>

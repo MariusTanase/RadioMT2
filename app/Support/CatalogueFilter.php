@@ -25,6 +25,23 @@ class CatalogueFilter
 
     private const SORTS = ['played', 'popular', 'voted', 'bitrate', 'az', 'country'];
 
+    /**
+     * The one place sort labels are written. Both the tune bar's <select> and
+     * the catalogue's "sorted by" rubric read this, so they cannot drift.
+     *
+     * "Most played here" counts real local plays; "Popular worldwide" is Radio
+     * Browser's imported click count, which this app never increments — the
+     * names say which is which rather than implying we measure both.
+     */
+    public const SORT_LABELS = [
+        'played' => 'Most played here',
+        'popular' => 'Popular worldwide',
+        'voted' => 'Most voted',
+        'bitrate' => 'Highest bitrate',
+        'az' => 'A–Z',
+        'country' => 'By country',
+    ];
+
     public readonly ?string $q;
 
     public readonly ?string $genre;

@@ -55,13 +55,6 @@
     @include('radio.partials.background')
 
     {{--
-        The Deck, the Tune bar and the audio element sit OUTSIDE #catalogue.
-        That is what keeps playback alive across a filter or page change:
-        catalogue.js only ever replaces the contents of #catalogue.
-    --}}
-    @include('radio.partials.deck')
-
-    {{--
         The single audio element for the whole app. It lives here, outside
         #catalogue, so a filter or page change never re-creates it and playback
         survives navigation. isPlaying is driven only by the element's own
@@ -75,7 +68,7 @@
            @pause="isPlaying = false"
            x-on:error="isPlaying = false"></audio>
 
-    <main x-data="catalogue" class="mx-auto w-full max-w-[1200px] px-4 max-[720px]:mb-24">
+    <main x-data="catalogue" class="mx-auto w-full max-w-[1200px] px-4">
         @include('radio.partials.tune-bar')
         @include('radio.partials.genre-band')
 
@@ -87,6 +80,14 @@
     </main>
 
     @include('radio.partials.settings')
-    @include('radio.partials.footer')
+
+    {{--
+        The dock is fixed to the bottom edge and is the only element there —
+        the old footer was also fixed-bottom and would collide, and the dock
+        carries the colophon itself at wider widths. It sits outside
+        #catalogue so a fragment swap never touches it and audio survives
+        navigation. --dock-h reserves the clearance beneath the catalogue.
+    --}}
+    @include('radio.partials.dock')
 </body>
 </html>

@@ -23,6 +23,27 @@
         'image' => $r->image,
         'url' => $r->url,
     ])->values();
+
+    // §7.2: the count line always states scope AND order in words, so a
+    // returning-to-defaults click never looks unexplained. Mirrors
+    // tune-bar.blade.php's own $sortOptions verbatim — duplicated rather
+    // than shared because that partial is out of this file's scope right
+    // now; whoever renames these per §8 ("Popular worldwide" / "Most
+    // played") should update both lists together.
+    $sortLabels = \App\Support\CatalogueFilter::SORT_LABELS;
+    $sortLabel = $sortLabels[$filter->sort] ?? $sortLabels['played'];
+
+    // §7.2: "No play data below this point — ordered A–Z" once every row on
+    // the current page has a zero ordering signal for the active sort.
+    // Computed from the rendered page, so it costs nothing extra.
+    $sortSignalExhausted = $radios->getCollection()->isNotEmpty() && match ($filter->sort) {
+        'voted' => $radios->getCollection()->every(fn ($r) => (int) ($r->votes ?? 0) === 0),
+        'bitrate' => $radios->getCollection()->every(fn ($r) => empty($r->bitrate)),
+        'az', 'country' => false,
+        default => $radios->getCollection()->every(
+            fn ($r) => (int) ($r->play_count ?? 0) === 0 && (int) ($r->click_count ?? 0) === 0
+        ),
+    };
 @endphp
 
 <div id="catalogue" class="mx-auto w-full max-w-[1100px] px-6 max-[640px]:px-4">
@@ -55,7 +76,12 @@
         </div>
     @endif
 
-    <p class="text-app-text font-opensans mb-2 text-right text-[14px] font-semibold" aria-live="polite">
+    {{-- Typography from the shared "Night Console" foundation: .nc-count-line is Sono 13/18/500 at 72%. --}}
+    <p @class([
+        'nc-count-line text-app-text text-right',
+        'mb-1' => $sortSignalExhausted,
+        'mb-2' => ! $sortSignalExhausted,
+    ]) aria-live="polite">
         {{ number_format($radios->total()) }} {{ Str::plural('station', $radios->total()) }}
         @if ($scopeInParts !== '')
             in {{ $scopeInParts }}
@@ -63,7 +89,14 @@
         @if ($filter->q !== null)
             {{ $scopeInParts !== '' ? '·' : '' }} matching "{{ $filter->q }}"
         @endif
+        · sorted by {{ $sortLabel }}
     </p>
+
+    @if ($sortSignalExhausted)
+        <p class="nc-count-line nc-op-48 text-app-text mb-2 text-right">
+            No play data below this point — ordered A–Z.
+        </p>
+    @endif
 
     @if ($radios->isEmpty())
         @include('radio.partials.empty-state', ['filter' => $filter])

@@ -56,14 +56,7 @@
 
     $countrySelectName = $filter->region !== null ? 'region' : 'country';
 
-    $sortOptions = [
-        'played' => 'Most played here',
-        'popular' => 'Popular worldwide',
-        'voted' => 'Most voted',
-        'bitrate' => 'Highest bitrate',
-        'az' => 'A–Z',
-        'country' => 'By country',
-    ];
+    $sortOptions = \App\Support\CatalogueFilter::SORT_LABELS;
 
     $languageOptions = collect($languages)
         ->map(fn (int $count, string $language) => ['language' => $language, 'count' => $count])
