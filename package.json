@@ -15,5 +15,10 @@
     },
     "optionalDependencies": {
         "@laravel/multiplex": "^0.4.1"
+    },
+    "dependencies": {
+        "@tsparticles/engine": "^4.4.0",
+        "alpinejs": "^3.17.3",
+        "tsparticles": "^4.4.0"
     }
 }
